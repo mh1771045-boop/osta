@@ -256,7 +256,7 @@ test("SIGHUP clears title and disposes scoped resources once", async () => {
   })
   const setTitle = setup.renderer.setTerminalTitle.bind(setup.renderer)
   setup.renderer.setTerminalTitle = (title) => {
-    if (title === "OpenCode") started()
+    if (title === "Osta") started()
     setTitle(title)
   }
   const listeners = new Set(process.listeners("SIGHUP"))
@@ -369,7 +369,7 @@ test("session lifecycle updates the terminal title and prints the epilogue after
     await task
 
     expect(stdout).toContain("Renamed session")
-    expect(stdout).toContain("opencode -s dummy")
+    expect(stdout).toContain("osta -s dummy")
     expect(promptRequests).toBe(0)
   } finally {
     process.stdout.write = originalWrite
@@ -457,7 +457,7 @@ test("session title generated while an untitled session is loading remains visib
 
     const generated = titles.lastIndexOf("OC | Generated title")
     expect(generated).toBeGreaterThan(-1)
-    expect(titles.slice(generated + 1)).not.toContain("OpenCode")
+    expect(titles.slice(generated + 1)).not.toContain("Osta")
     setup.renderer.destroy()
     await task
   } finally {
@@ -2458,7 +2458,7 @@ test("free usage limit claims suppression atomically across two TUI instances an
           {
             id: "opencode-go",
             name: "OpenCode Go",
-            methods: [{ id: "device", type: "oauth", label: "Sign in with your OpenCode account" }, { type: "key" }],
+            methods: [{ id: "device", type: "oauth", label: "Sign in with your Osta account" }, { type: "key" }],
             connections: [],
           },
         ],

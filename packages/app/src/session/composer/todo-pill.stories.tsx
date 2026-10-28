@@ -111,7 +111,7 @@ function Preview(props: PreviewArgs) {
 }
 
 export default {
-  title: "OpenCode/Session/Todo pill",
+  title: "Osta/Session/Todo pill",
   id: "session-todo-pill",
   render: (args: PreviewArgs) => <Preview {...args} />,
   args: { progress: 3, open: false, activity: true },

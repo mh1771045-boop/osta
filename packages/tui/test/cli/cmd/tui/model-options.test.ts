@@ -48,7 +48,7 @@ describe("sortModelOptions", () => {
     expect(sorted.map((model) => model.title)).toEqual(["Kimi K3", "Claude Sonnet 4", "Claude Opus 4", "GPT 5"])
   })
 
-  test("keeps ungrouped results free-first regardless of OpenCode provider", () => {
+  test("keeps ungrouped results free-first regardless of Osta provider", () => {
     const sorted = sortModelOptions(
       [
         { providerID: "opencode-go", title: "Go model" },
@@ -81,7 +81,7 @@ describe("sortModelOptions", () => {
     expect(sorted.map((model) => model.title)).toEqual(["Claude Sonnet 4", "Claude Opus 4"])
   })
 
-  test("preserves the server's order for free OpenCode models", () => {
+  test("preserves the server's order for free Osta models", () => {
     // `Model.available()` puts the preferred free models first, then the rest newest-first.
     const serverOrder = [
       "Big Pickle",

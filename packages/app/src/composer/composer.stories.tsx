@@ -374,7 +374,7 @@ type FlowArgs = {
 }
 
 export default {
-  title: "OpenCode/Composer/Flow",
+  title: "Osta/Composer/Flow",
   component: Composer,
   parameters: { layout: "centered" },
   // States that only change the composer's props share this render, so moving between them keeps one composer.

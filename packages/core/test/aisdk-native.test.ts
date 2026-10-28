@@ -471,7 +471,7 @@ describe("AISDKNative", () => {
   test("maps OpenRouter settings to native destinations", () => {
     expect(
       map("@openrouter/ai-sdk-provider", {
-        appName: "OpenCode",
+        appName: "Osta",
         appUrl: "https://opencode.ai",
         headers: { "x-openrouter-title": "Configured", "x-provider-api-keys": "Configured BYOK" },
         api_keys: { anthropic: "provider-key" },

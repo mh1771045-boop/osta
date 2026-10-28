@@ -1,6 +1,6 @@
 # Changelog
 
-Release notes for OpenCode V2, newest first.
+Osta's own release notes are in [RELEASE_NOTES.md](RELEASE_NOTES.md) and on the [Releases page](https://github.com/mh1771045-boop/osta/releases). The entries below are the upstream opencode V2 changelog that Osta 0.1.0 is based on, newest first.
 
 ## v2.2.0 — 2026-10-27
 

@@ -25,7 +25,7 @@ export function success(options?: CallbackPageOptions) {
     body: renderCard({
       status: "success",
       headline: "Authorization successful",
-      message: provider ? `OpenCode is now connected to ${escapeHtml(provider)}.` : "OpenCode is now authorized.",
+      message: provider ? `Osta is now connected to ${escapeHtml(provider)}.` : "Osta is now authorized.",
       footnote: "You can close this window.",
     }),
     script: options?.autoClose === false ? undefined : AUTO_CLOSE_SCRIPT,
@@ -40,10 +40,10 @@ export function error(detail: string, options?: CallbackPageOptions) {
       status: "error",
       headline: "Authorization failed",
       message: provider
-        ? `OpenCode couldn't finish connecting to ${escapeHtml(provider)}.`
-        : "OpenCode couldn't complete authorization.",
+        ? `Osta couldn't finish connecting to ${escapeHtml(provider)}.`
+        : "Osta couldn't complete authorization.",
       detail,
-      footnote: "Close this window and try again from OpenCode.",
+      footnote: "Close this window and try again from Osta.",
     }),
   })
 }
@@ -100,7 +100,7 @@ function renderDocument(input: { title: string; body: string; script?: string })
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>${escapeHtml(input.title)} · OpenCode</title>
+    <title>${escapeHtml(input.title)} · Osta</title>
     <style>${STYLES}</style>
   </head>
   <body>
@@ -116,8 +116,8 @@ function bootstrapScript(options: BootstrapOptions) {
 var TOKEN_URL=new URL(${scriptString(options.tokenPath)},window.location.origin).href;
 (function(){
   var card=document.getElementById("oc-card"),headline=document.getElementById("oc-headline"),message=document.getElementById("oc-message"),detail=document.getElementById("oc-detail"),footnote=document.getElementById("oc-footnote");
-  function fail(text){card.dataset.status="error";headline.textContent="Authorization failed";message.textContent=PROVIDER?("OpenCode couldn't finish connecting to "+PROVIDER+"."):"OpenCode couldn't complete authorization.";if(text){detail.textContent=text;detail.hidden=false}footnote.textContent="Close this window and try again from OpenCode."}
-  function ok(){card.dataset.status="success";headline.textContent="Authorization successful";message.textContent=PROVIDER?("OpenCode is now connected to "+PROVIDER+"."):"OpenCode is now authorized.";detail.hidden=true;footnote.textContent="You can close this window.";setTimeout(function(){try{window.close()}catch(e){}},2500)}
+  function fail(text){card.dataset.status="error";headline.textContent="Authorization failed";message.textContent=PROVIDER?("Osta couldn't finish connecting to "+PROVIDER+"."):"Osta couldn't complete authorization.";if(text){detail.textContent=text;detail.hidden=false}footnote.textContent="Close this window and try again from Osta."}
+  function ok(){card.dataset.status="success";headline.textContent="Authorization successful";message.textContent=PROVIDER?("Osta is now connected to "+PROVIDER+"."):"Osta is now authorized.";detail.hidden=true;footnote.textContent="You can close this window.";setTimeout(function(){try{window.close()}catch(e){}},2500)}
   try{
     var hash=new URLSearchParams((window.location.hash||"").slice(1));
     var search=new URLSearchParams(window.location.search||"");
@@ -249,24 +249,11 @@ const STYLES = `
   @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
 `
 
-// OpenCode wordmark — same path geometry as packages/ui/src/components/logo.tsx (Logo).
-const WORDMARK = `<svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 234 42" fill="none" aria-label="OpenCode" role="img">
-        <path d="M18 30H6V18H18V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M18 12H6V30H18V12ZM24 36H0V6H24V36Z" fill="var(--oc-icon-base)" />
-        <path d="M48 30H36V18H48V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M36 30H48V12H36V30ZM54 36H36V42H30V6H54V36Z" fill="var(--oc-icon-base)" />
-        <path d="M84 24V30H66V24H84Z" fill="var(--oc-icon-weak)" />
-        <path d="M84 24H66V30H84V36H60V6H84V24ZM66 18H78V12H66V18Z" fill="var(--oc-icon-base)" />
-        <path d="M108 36H96V18H108V36Z" fill="var(--oc-icon-weak)" />
-        <path d="M108 12H96V36H90V6H108V12ZM114 36H108V12H114V36Z" fill="var(--oc-icon-base)" />
-        <path d="M144 30H126V18H144V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M144 12H126V30H144V36H120V6H144V12Z" fill="var(--oc-icon-strong)" />
-        <path d="M168 30H156V18H168V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M168 12H156V30H168V12ZM174 36H150V6H174V36Z" fill="var(--oc-icon-strong)" />
-        <path d="M198 30H186V18H198V30Z" fill="var(--oc-icon-weak)" />
-        <path d="M198 12H186V30H198V12ZM204 36H180V6H198V0H204V36Z" fill="var(--oc-icon-strong)" />
-        <path d="M234 24V30H216V24H234Z" fill="var(--oc-icon-weak)" />
-        <path d="M216 12V18H228V12H216ZM234 24H216V30H234V36H210V6H234V24Z" fill="var(--oc-icon-strong)" />
+// Osta wordmark — generated by script/osta/wordmark.ts, same geometry as packages/ui/src/components/logo.tsx (Logo).
+const WORDMARK = `<svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 114 42" fill="none" aria-label="Osta" role="img">
+        <path d="M60 0H66V6H60ZM60 6H66V12H60ZM60 12H66V18H60ZM66 6H72V12H66ZM72 6H78V12H72ZM78 6H84V12H78ZM90 6H96V12H90ZM96 6H102V12H96ZM102 6H108V12H102ZM108 6H114V12H108ZM108 12H114V18H108ZM60 18H66V24H60ZM60 24H66V30H60ZM90 18H96V24H90ZM90 24H96V30H90ZM96 18H102V24H96ZM102 18H108V24H102ZM108 18H114V24H108ZM108 24H114V30H108ZM60 30H66V36H60ZM66 30H72V36H66ZM72 30H78V36H72ZM78 30H84V36H78ZM90 30H96V36H90ZM96 30H102V36H96ZM102 30H108V36H102ZM108 30H114V36H108Z" fill="var(--oc-icon-strong)" />
+        <path d="M0 6H6V12H0ZM0 12H6V18H0ZM6 6H12V12H6ZM12 6H18V12H12ZM18 6H24V12H18ZM18 12H24V18H18ZM30 6H36V12H30ZM30 12H36V18H30ZM36 6H42V12H36ZM42 6H48V12H42ZM48 6H54V12H48ZM0 18H6V24H0ZM0 24H6V30H0ZM18 18H24V24H18ZM18 24H24V30H18ZM30 18H36V24H30ZM36 18H42V24H36ZM42 18H48V24H42ZM48 18H54V24H48ZM48 24H54V30H48ZM0 30H6V36H0ZM6 30H12V36H6ZM12 30H18V36H12ZM18 30H24V36H18ZM30 30H36V36H30ZM36 30H42V36H36ZM42 30H48V36H42ZM48 30H54V36H48Z" fill="var(--oc-icon-base)" />
+        <path d="M36 12H42V18H36ZM42 12H48V18H42ZM48 12H54V18H48ZM90 12H96V18H90ZM96 12H102V18H96ZM102 12H108V18H102ZM6 18H12V24H6ZM6 24H12V30H6ZM12 18H18V24H12ZM12 24H18V30H12ZM30 24H36V30H30ZM36 24H42V30H36ZM42 24H48V30H42ZM66 18H72V24H66ZM66 24H72V30H66ZM72 18H78V24H72ZM72 24H78V30H72ZM78 18H84V24H78ZM78 24H84V30H78ZM96 24H102V30H96ZM102 24H108V30H102Z" fill="var(--oc-icon-weak)" />
       </svg>`
 
 const ICON_CHECK = `<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.4 2.4 4.6-5.4" /></svg>`

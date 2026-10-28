@@ -132,7 +132,7 @@ test.each([
     shortenPickerRecentPath("/srv/clients/acme/services/payments-gateway", "/home/luke"),
     "/srv/…/services/payments-gateway",
   ],
-  ["recent short Windows", shortenPickerRecentPath("C:/OpenCode/NewProject", ""), "C:\\OpenCode\\NewProject"],
+  ["recent short Windows", shortenPickerRecentPath("C:/Osta/NewProject", ""), "C:\\Osta\\NewProject"],
   [
     "recent deep Windows",
     shortenPickerRecentPath("C:/Users/luke/work/acme/repo", "C:/Users/luke"),

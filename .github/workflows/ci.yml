@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - name: Set up Bun
+        uses: ./.github/actions/setup-bun
+      - name: No opencode naming left in user-visible text
+        run: bun script/osta/rebrand.ts --check
+      - name: Osta tests
+        run: |
+          set -e
+          (cd packages/core && bun run script/test.ts test/preload.test.ts test/session-system-prompt.test.ts test/plugin/optimize.test.ts test/instruction-discovery.test.ts test/app.test.ts)
+          (cd packages/cli && bun test --timeout 30000 test/acp test/auth.test.ts test/debug-paths.test.ts test/stats.test.ts test/mini.test.ts test/updater-install.test.ts)
+          (cd packages/tui && bun test --timeout 30000 test/util/presentation.test.ts test/util/tool-display.test.ts test/mini/splash.test.ts)
+      - name: Build Osta for Linux x64
+        working-directory: packages/cli
+        run: bun run script/build.ts --single --skip-install
+        env:
+          OPENCODE_CHANNEL: ci
+      - name: Smoke test
+        run: |
+          set -e
+          bin=packages/cli/dist/cli-linux-x64/bin/osta
+          "$bin" --version
+          "$bin" --help | tee help.txt
+          grep -q "Osta command line interface" help.txt

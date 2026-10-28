@@ -1,3 +1,17 @@
+# Osta
+
+Osta (أسطى) is built on OpenCode V2 and works the same way, so the OpenCode
+documentation below applies to Osta with these differences:
+
+- The command is `osta` instead of `opencode` (for example `osta auth login`).
+- Global settings live in `~/.config/osta`, data in `~/.local/share/osta`.
+- Osta reads `osta.json`/`osta.jsonc` and `.osta/` next to the OpenCode names
+  `opencode.json`, `opencode.jsonc`, and `.opencode/`, which keep working.
+- `OSTA_*` environment variables work wherever OpenCode reads `OPENCODE_*`.
+- Osta loads its learning memory from `.osta/learnings.md` and
+  `~/.config/osta/learnings.md` (turn it off with `OSTA_DISABLE_LEARNINGS=1`).
+- Osta's source and issues: <https://github.com/mh1771045-boop/osta>.
+
 # OpenCode
 
 Use this guide as the starting point for work involving OpenCode itself. It

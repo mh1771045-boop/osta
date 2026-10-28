@@ -153,7 +153,7 @@ it.effect("uses the first key or env connection Integration lists and never a Ch
 )
 
 it.effect(
-  "starts GPT-Live on OpenCode's hosted endpoint with an OpenCode Console connection only without an OpenAI key",
+  "starts GPT-Live on Osta's hosted endpoint with an OpenCode Console connection only without an OpenAI key",
   () =>
     Effect.gen(function* () {
       const requests: HttpClientRequest.HttpClientRequest[] = []

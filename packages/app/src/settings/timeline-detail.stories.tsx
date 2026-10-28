@@ -7,7 +7,7 @@ import { TimelineDetailControl } from "./timeline-detail"
 import "./settings.css"
 
 export default {
-  title: "OpenCode/Settings/Timeline detail",
+  title: "Osta/Settings/Timeline detail",
   id: "settings-timeline-detail",
 }
 

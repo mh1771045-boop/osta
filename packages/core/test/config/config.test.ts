@@ -379,7 +379,7 @@ describe("Config", () => {
       JSON.parse(
         ConfigDiscovery.stripPreferenceMetadata(
           JSON.stringify({
-            PayloadDisplayName: "OpenCode",
+            PayloadDisplayName: "Osta",
             PayloadIdentifier: "ai.opencode.managed",
             PayloadType: "ai.opencode.managed",
             PayloadUUID: "00000000-0000-0000-0000-000000000000",

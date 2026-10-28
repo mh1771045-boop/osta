@@ -7,7 +7,7 @@ import { timelinePresets, type TimelinePlacement } from "./detail"
 import { SessionTimeline } from "./session-timeline"
 
 export default {
-  title: "OpenCode/Conversation/Commentary",
+  title: "Osta/Conversation/Commentary",
   id: "current-session-commentary",
   component: SessionTimeline,
   parameters: { layout: "fullscreen" },

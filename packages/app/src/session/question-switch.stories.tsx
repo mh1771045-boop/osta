@@ -2,7 +2,7 @@ import { activeQuestionRequest, questionPendingDocument } from "@opencode/sessio
 import { SessionPreview } from "./story-model"
 
 export default {
-  title: "OpenCode/Session/Question switch",
+  title: "Osta/Session/Question switch",
   id: "session-question-switch",
   component: SessionPreview,
   parameters: {

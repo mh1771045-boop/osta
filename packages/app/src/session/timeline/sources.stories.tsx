@@ -306,7 +306,7 @@ function Side(props: ParentProps<{ expand: boolean; count: number; onClose: () =
 }
 
 export default {
-  title: "OpenCode/Session/Sources",
+  title: "Osta/Session/Sources",
   id: "session-sources",
   render: (args: SourcesArgs) => <Sources {...args} />,
   args: { turn: "three", icons: "letters", panel: false, expand: false },

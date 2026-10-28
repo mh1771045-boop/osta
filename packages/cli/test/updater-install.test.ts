@@ -204,7 +204,7 @@ it.live("bun ignores install cache cleanup failures", () =>
   }),
 )
 ;["success", "download", "install"].forEach((failure) => {
-  it.live(`curl uses the V2 installer and cleans its directory: ${failure}`, () =>
+  it.live(`curl uses the Osta installer and cleans its directory: ${failure}`, () =>
     Effect.gen(function* () {
       const test = yield* fixture((command) => {
         const installer = command.command === "curl" ? command.args[2] : command.args[0]
@@ -222,7 +222,7 @@ it.live("bun ignores install cache cleanup failures", () =>
       const installer = test.commands[0]?.[3]
       expect(installer).toStartWith(path.join(test.global.cache, "update-"))
       expect(test.commands).toEqual([
-        ["curl", "-fsSL", "-o", installer, "https://opencode.ai/v2/install"],
+        ["curl", "-fsSL", "-o", installer, "https://raw.githubusercontent.com/mh1771045-boop/osta/main/install"],
         ...(failure === "download" ? [] : [[test.bash, installer, "--version", "2.3.4-beta.1", "--no-modify-path"]]),
       ])
       expect(yield* test.fs.readDirectory(test.global.cache)).toEqual([])
@@ -320,7 +320,7 @@ it.live("Homebrew Core installs check and upgrade the Core formula", () =>
     expect(yield* test.updater.latest("npm")).toBe("2.3.4")
     expect(test.requests).toEqual([
       "https://formulae.brew.sh/api/formula/opencode.json",
-      "https://opencode.ai/update/api/local/cli/npm?current=local",
+      "https://api.github.com/repos/mh1771045-boop/osta/releases/latest",
     ])
   }),
 )
@@ -333,8 +333,8 @@ it.live("Homebrew Core installs check and upgrade the Core formula", () =>
       yield* test.updater.upgrade("brew", "2.3.4")
       expect(test.commands).toEqual([["brew", "upgrade", `anomalyco/tap/${formula}`]])
       expect(test.requests).toEqual([
-        "https://opencode.ai/update/api/local/cli/homebrew?current=local",
-        "https://opencode.ai/update/api/local/cli/homebrew?current=local",
+        "https://api.github.com/repos/mh1771045-boop/osta/releases/latest",
+        "https://api.github.com/repos/mh1771045-boop/osta/releases/latest",
       ])
     }),
   )
@@ -363,7 +363,7 @@ const winget = (search: Partial<AppProcess.RunResult>) =>
   )
 const wingetArgs = [
   "--id",
-  "Anomaly.OpenCode",
+  "Anomaly.Osta",
   "--exact",
   "--source",
   "winget",
@@ -375,7 +375,7 @@ it.live("WinGet installs check, upgrade, and remove the version in the WinGet in
   Effect.gen(function* () {
     const test = yield* winget({
       stdout: Buffer.from(
-        "Name     Id               Version\r\n------------------------------\r\nOpenCode Anomaly.OpenCode 2.0.28\r\n",
+        "Name     Id               Version\r\n------------------------------\r\nOpenCode Anomaly.Osta 2.0.28\r\n",
       ),
     })
     expect(yield* test.updater.method()).toBe("winget")
@@ -483,7 +483,7 @@ windows("windows links the curl binary before the installer replaces it", () =>
       false,
       "@opencode/cli",
       undefined,
-      (_root, home) => Effect.succeed(path.join(home, ".opencode", "bin", "opencode.exe")),
+      (_root, home) => Effect.succeed(path.join(home, ".osta", "bin", "osta.exe")),
     )
     layout.executable = test.executable
     layout.cache = test.global.cache
@@ -510,7 +510,7 @@ unix("curl method detection resolves symlinked home directories", () =>
         Effect.gen(function* () {
           const fs = yield* FileSystem.FileSystem
           const realHome = path.join(root, "real-home")
-          const bin = path.join(realHome, ".opencode", "bin", "opencode")
+          const bin = path.join(realHome, ".osta", "bin", "osta")
           yield* fs.makeDirectory(path.dirname(bin), { recursive: true })
           yield* fs.symlink(realHome, home)
           return bin

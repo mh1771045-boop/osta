@@ -1,114 +1,97 @@
-<p align="center">
-  <a href="https://opencode.ai">
-    <picture>
-      <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
-      <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
-      <img src="packages/console/app/src/asset/logo-ornate-light.svg" alt="شعار OpenCode">
-    </picture>
-  </a>
-</p>
-<p align="center">وكيل برمجة بالذكاء الاصطناعي مفتوح المصدر.</p>
-<p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/@opencode/cli"><img alt="npm" src="https://img.shields.io/npm/v/@opencode/cli?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/opencode/actions/workflows/release.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/opencode/release.yml?style=flat-square&branch=dev" /></a>
-</p>
+<div dir="rtl">
 
 <p align="center">
-  <a href="README.md">English</a> |
-  <a href="README.zh.md">简体中文</a> |
-  <a href="README.zht.md">繁體中文</a> |
-  <a href="README.ko.md">한국어</a> |
-  <a href="README.de.md">Deutsch</a> |
-  <a href="README.es.md">Español</a> |
-  <a href="README.fr.md">Français</a> |
-  <a href="README.it.md">Italiano</a> |
-  <a href="README.da.md">Dansk</a> |
-  <a href="README.ja.md">日本語</a> |
-  <a href="README.pl.md">Polski</a> |
-  <a href="README.ru.md">Русский</a> |
-  <a href="README.bs.md">Bosanski</a> |
-  <a href="README.ar.md">العربية</a> |
-  <a href="README.no.md">Norsk</a> |
-  <a href="README.br.md">Português (Brasil)</a> |
-  <a href="README.th.md">ไทย</a> |
-  <a href="README.tr.md">Türkçe</a> |
-  <a href="README.uk.md">Українська</a> |
-  <a href="README.bn.md">বাংলা</a> |
-  <a href="README.gr.md">Ελληνικά</a> |
-  <a href="README.vi.md">Tiếng Việt</a>
+  <picture>
+    <source srcset=".github/assets/osta-dark.svg" media="(prefers-color-scheme: dark)">
+    <source srcset=".github/assets/osta-light.svg" media="(prefers-color-scheme: light)">
+    <img src=".github/assets/osta-light.svg" alt="أسطى" width="342">
+  </picture>
 </p>
-
-[![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+<p align="center"><b>أسطى (Osta)</b>: مساعد برمجة بالذكاء الاصطناعي، مفتوح المصدر، وبيشتغل زي الأسطى الشاطر.<br>موديلات مجانية من أول تشغيل، من غير حساب ومن غير مفتاح API.</p>
+<p align="center">
+  <a href="README.md">English</a> | <a href="README.ar.md">العربية</a>
+</p>
 
 ---
+
+«الأسطى» هو الصنايعي الشاطر اللي بيعمل الشغلانة صح من أول مرة، بسرعة، ومن غير ما حد يقف على راسه. «أسطى» مساعد برمجة بيشتغل في التيرمينال، ومبني على [opencode](https://github.com/anomalyco/opencode). بيعمل كل اللي opencode بيعمله، وفوقه طريقة شغل خاصة بيه، وبيفتكر اللي اتعلّمه من كل مشروع.
 
 ### التثبيت
 
-```bash
-# YOLO
-curl -fsSL https://opencode.ai/v2/install | bash
+على ماك ولينكس:
 
-# مديري الحزم
-npm i -g @opencode/cli@latest      # او bun/pnpm/yarn
-brew install anomalyco/tap/opencode-v2 # macOS و Linux (موصى به، دائما محدث)
-brew install opencode              # macOS و Linux (صيغة brew الرسمية، تحديث اقل)
-sudo pacman -S opencode            # Arch Linux (Stable)
-paru -S opencode-beta              # Arch Linux (Latest from AUR)
-mise use -g opencode               # اي نظام
-nix run github:anomalyco/opencode  # Nix
-```
-
-> [!TIP]
-> احذف الاصدارات الاقدم من 0.1.x قبل التثبيت.
-
-### تطبيق سطح المكتب (BETA)
-
-يتوفر OpenCode ايضا كتطبيق سطح مكتب. قم بالتنزيل من [opencode.ai/download](https://opencode.ai/download).
-
-| المنصة                | التنزيل                            |
-| --------------------- | ---------------------------------- |
-| macOS (Apple Silicon) | `opencode-desktop-mac-arm64.dmg`   |
-| macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
-| Windows               | `opencode-desktop-win-x64.exe`     |
-| Linux                 | `.deb` او `.rpm` او AppImage       |
+<div dir="ltr">
 
 ```bash
-# macOS (Homebrew)
-brew install --cask opencode-desktop
+curl -fsSL https://raw.githubusercontent.com/mh1771045-boop/osta/main/install | bash
 ```
 
-#### مجلد التثبيت
+</div>
 
-يثبت سكربت التثبيت OpenCode في `$HOME/.opencode/bin`.
+على ويندوز: شغّل نفس الأمر في Git Bash أو WSL.
 
-### Agents
+بعد كده افتح تيرمينال جديد، ادخل على فولدر المشروع، واكتب:
 
-يتضمن OpenCode وكيليْن (Agents) مدمجين يمكنك التبديل بينهما باستخدام زر `Tab`.
+<div dir="ltr">
 
-- **build** - الافتراضي، وكيل بصلاحيات كاملة لاعمال التطوير
-- **plan** - وكيل للقراءة فقط للتحليل واستكشاف الكود
-  - يرفض تعديل الملفات افتراضيا
-  - يطلب الاذن قبل تشغيل اوامر bash
-  - مثالي لاستكشاف قواعد كود غير مألوفة او لتخطيط التغييرات
+```bash
+osta
+```
 
-بالاضافة الى ذلك يوجد وكيل فرعي **general** للبحث المعقد والمهام متعددة الخطوات.
-يستخدم داخليا ويمكن استدعاؤه بكتابة `@general` في الرسائل.
+</div>
 
-تعرف على المزيد حول [agents](https://opencode.ai/v2/docs/agents).
+النسخ الجاهزة لكل الأنظمة موجودة في [صفحة الإصدارات](https://github.com/mh1771045-boop/osta/releases).
 
-### التوثيق
+### ببلاش ومن غير مفتاح API
 
-لمزيد من المعلومات حول كيفية ضبط OpenCode، [**راجع التوثيق**](https://opencode.ai/v2/docs).
+أسطى بيبدأ بموديلات مجانية، ومش هيطلب منك أي مفتاح في أول تشغيل.
 
-### المساهمة
+- **موديلات مجانية جاهزة:** جاية من الباقة المجانية في OpenCode Zen، وهي خدمة الموديلات بتاعة فريق opencode. الخدمة دي هي اللي بتحدد الموديلات المتاحة وحدودها وسياسة البيانات، وده ممكن يتغير.
+- **GitHub Copilot المجاني:** اكتب `osta auth login`، اختار GitHub Copilot، وسجّل دخول بحساب GitHub من المتصفح.
+- **موديلات على جهازك:** شغّل موديلات على جهازك بـ Ollama أو LM Studio وضيفها كـ provider. أسطى بيستخدم نفس إعدادات الـ providers بتاعة opencode ([شرح OpenCode V2](https://opencode.ai/v2/docs/)).
 
-اذا كنت مهتما بالمساهمة في OpenCode، يرجى قراءة [contributing docs](./CONTRIBUTING.md) قبل ارسال pull request.
+الخدمات المدفوعة زي Anthropic وOpenAI وGoogle شغالة برضه، بس عمرك ما هتحتاجها.
 
-### البناء فوق OpenCode
+### أسطى زوّد إيه على opencode
 
-اذا كنت تعمل على مشروع مرتبط بـ OpenCode ويستخدم "opencode" كجزء من اسمه (مثل "opencode-dashboard" او "opencode-mobile")، يرجى اضافة ملاحظة في README توضح انه ليس مبنيا بواسطة فريق OpenCode ولا يرتبط بنا بأي شكل.
+- **طريقة شغل الأسطى:** كل الموديلات بتمشي على نفس الخطوات: يفهم، يقرر، ينفّذ، يتأكد، يبلّغ، يتعلّم. أسطى بيثبت إن التعديل شغال (اختبارات، تايبس، بيلد) قبل ما يقول إنه خلص، وبيقول بوضوح إيه اللي مقدرش يتأكد منه.
+- **ذاكرة التعلّم:** بعد أي شغل مهم، أسطى بيكتب دروس قصيرة في `.osta/learnings.md` جوه المشروع، أو في `~/.config/osta/learnings.md` لو الدرس ينفع في كل حاجة. الملفين بيتقروا مع بداية كل جلسة، ولو المساحة ضاقت بيحتفظ بالأحدث. دول ملفات Markdown عادية تقدر تقراها وتعدّلها وتمسحها. ولو عايز تقفل الميزة دي: `OSTA_DISABLE_LEARNINGS=1`.
+- **عربي وإنجليزي:** أسطى بيرد باللغة اللي بتكتب بيها، حتى بالمصري، والكود والتعليقات والـ commits بتفضل بالإنجليزي.
+- **بيته الخاص ومتوافق مع opencode:** الإعدادات في `~/.config/osta` و`osta.json` و`.osta/`. ملفات `opencode.json` و`.opencode/` و`AGENTS.md` اللي عندك هتفضل شغالة. ومتغيرات `OSTA_*` شغالة في أي مكان opencode بيقرا فيه `OPENCODE_*`.
 
----
+وكل الباقي من opencode: واجهة التيرمينال، الـ agents اللي اسمهم `build` و`plan`، الـ subagents، أكتر من 75 provider، سيرفرات MCP، الـ LSP، الإضافات، الثيمات، الجلسات، `osta run` للسكريبتات، و`osta serve` و`osta pair` عشان تستخدمه من المتصفح.
 
-**انضم الى مجتمعنا** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
+### استخدامه من الموبايل
+
+أسطى بيشتغل على كمبيوتر. عشان تتحكم فيه من الموبايل وانتو على نفس الواي فاي: شغّل `osta service set hostname 0.0.0.0` مرة واحدة على الكمبيوتر، وبعدين `osta pair`، وافتح اللينك اللي هيطلعلك في متصفح الموبايل. ولو عايز لينك يشتغل من أي مكان استخدم `osta pair --remote`، وهو هيسألك الأول لأنه بيفتح جهازك على الإنترنت.
+
+### البناء من الكود
+
+محتاج [Bun](https://bun.sh) نسخة 1.4.4 أو أحدث.
+
+<div dir="ltr">
+
+```bash
+git clone https://github.com/mh1771045-boop/osta.git
+cd osta
+bun install
+bun dev            # تشغيل أسطى من الكود
+cd packages/cli && bun run script/build.ts --single   # بناء نسخة لجهازك
+```
+
+</div>
+
+السكريبت `script/osta/rebrand.ts` بيرجّع أسماء أسطى بعد ما تدمج تحديثات جديدة من opencode.
+
+### حدود معروفة
+
+- أجزاء من تطبيق الويب والديسكتوب لسه فيها رسومات opencode، زي اللوجو المتحرك في شاشة الجلسة الجديدة. تطبيق التيرمينال والأوامر وصفحات تسجيل الدخول كلها بقت باسم أسطى.
+- أسطى لسه مش منشور على npm أو Homebrew أو WinGet. ثبّته بالسكريبت اللي فوق أو من صفحة الإصدارات.
+
+### الشكر والرخصة
+
+أسطى مبني على [opencode](https://github.com/anomalyco/opencode) من شركة Anomaly، المنشور برخصة MIT. وأسطى كمان برخصة MIT، شوف ملف [LICENSE](LICENSE). أسطى مشروع مستقل، ومالوش علاقة رسمية بفريق opencode.
+
+تصميم وتطوير: محمد الشيخ · [واتساب](https://wa.me/201206580045)
+
+</div>

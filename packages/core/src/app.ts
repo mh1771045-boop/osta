@@ -21,8 +21,10 @@ export function make(input: Partial<Info> = {}): Info {
   }
 }
 
+// Osta is built on opencode, so it keeps opencode's product token for compatible services and
+// names itself next to it.
 export function useragent(app: Info) {
-  return `opencode/${app.channel}/${app.version}/${app.name}`
+  return `opencode/${app.channel}/${app.version}/${app.name} osta/${app.version}`
 }
 
 export const layer = (input?: Partial<Info>) => Layer.succeed(Metadata, make(input))

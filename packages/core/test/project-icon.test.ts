@@ -87,7 +87,7 @@ for (const fixture of [
     file: "assets/AppIcon.icon/Assets/logo.svg",
     manifest: "assets/AppIcon.icon/icon.json",
   },
-  { name: "direct-child Xcode catalog", file: "OpenCode/Assets.xcassets/AppIcon.appiconset/icon128.svg" },
+  { name: "direct-child Xcode catalog", file: "Osta/Assets.xcassets/AppIcon.appiconset/icon128.svg" },
   { name: "Windows nearest usable size", file: "resources/windows/icon-96.png" },
   { name: "Scrawl oversized flat icon", file: "site/public/icon.svg" },
 ]) {

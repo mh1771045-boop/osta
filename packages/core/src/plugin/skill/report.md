@@ -4,9 +4,10 @@
   content.
 -->
 
-# Report an opencode Issue
+# Report an Osta Issue
 
-Use this skill when the user wants to report an opencode issue or bug. Your job
+Use this skill when the user wants to report an Osta issue or bug. Osta's
+issues live at https://github.com/mh1771045-boop/osta/issues. Your job
 is to turn the user's problem into a useful GitHub issue with standard
 diagnostics plus the context needed to reproduce and resolve it.
 
@@ -26,7 +27,7 @@ title/body for the user.
 
 Collect these values when possible:
 
-- opencode version: run `opencode --version`.
+- Osta version: run `osta --version`.
 - Operating system: run `uname -a` on Unix-like systems, or `ver` on Windows.
 - Terminal: inspect `$TERM`, `$TERM_PROGRAM`, `$COLORTERM`, and any obvious
   terminal app context the user provides.
@@ -34,9 +35,9 @@ Collect these values when possible:
   Windows when relevant.
 - Install/channel context: include whether this appears to be local, dev, beta,
   or release if the version output or environment reveals it.
-- Active plugins: inspect opencode config for configured plugins when possible.
-  Check likely config locations such as `opencode.json`, `opencode.jsonc`,
-  `.opencode/opencode.json`, and `~/.config/opencode/opencode.json`. Record
+- Active plugins: inspect Osta config for configured plugins when possible.
+  Check likely config locations such as `osta.json`, `opencode.json`,
+  `.osta/`, `.opencode/opencode.json`, and `~/.config/osta/`. Record
   configured plugin entries, local plugin files under `.opencode/plugin/` or
   `.opencode/plugins/`, and note if plugin status could not be determined.
 
@@ -53,7 +54,7 @@ Capture the details that make the issue actionable:
 - Reproduction steps, ideally minimal and numbered.
 - Relevant logs, stack traces, screenshots, terminal output, or config snippets.
 - Whether the issue is reproducible consistently, intermittently, or only once.
-- Recent changes that may be related, such as updating opencode, changing
+- Recent changes that may be related, such as updating Osta, changing
   config, installing a plugin, changing terminal, or switching workspace.
 - Workarounds tried and whether they helped.
 
@@ -112,7 +113,7 @@ Examples: `tui: skills dialog crashes outside location provider`,
 Use GitHub CLI from the repository checkout when available:
 
 ```sh
-gh issue create --title "<title>" --body-file <file>
+gh issue create --repo mh1771045-boop/osta --title "<title>" --body-file <file>
 ```
 
 Write the body to a temporary markdown file first so quoting, newlines, logs,

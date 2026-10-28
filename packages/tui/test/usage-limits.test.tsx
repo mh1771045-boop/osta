@@ -97,6 +97,7 @@ test("shows what the workspace's limits leave and why a refused turn stopped", a
       if (url.pathname === "/api/agent")
         return json({ location, data: [{ id: "build", mode: "primary", hidden: false, permissions: [] }] })
       if (url.pathname === "/api/provider")
+        // osta-keep: the opencode integration keeps its own name.
         return json({ location, data: [{ id: "opencode", integrationID: "opencode", name: "OpenCode" }] })
       if (url.pathname === "/api/model")
         return json({

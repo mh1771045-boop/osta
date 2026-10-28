@@ -231,6 +231,8 @@ describe("ConfigInstructionPlugin.Plugin", () => {
             { path: projectFile, type: "file" },
             { path: sharedFile, type: "file" },
             { path: path.join(home, "AGENTS.md"), type: "file" },
+            { path: path.join(global, "learnings.md"), type: "file" },
+            { path: path.join(project, ".osta", "learnings.md"), type: "file" },
           ])
           expect(yield* watcher.subscriptions()).not.toContainEqual({
             path: path.join(tmp.path, "AGENTS.md"),
@@ -273,6 +275,63 @@ describe("ConfigInstructionPlugin.Plugin", () => {
             instructionLayer({
               config: global,
               home,
+              locationServiceLayer: Layer.succeed(
+                Location.Service,
+                Location.Service.of(
+                  location(
+                    { directory: AbsolutePath.make(directory) },
+                    { projectDirectory: AbsolutePath.make(project) },
+                  ),
+                ),
+              ),
+            }),
+          ),
+        )
+      }),
+    ),
+  )
+
+  it.live("loads Osta learnings from the global config and the project's .osta directory", () =>
+    Effect.acquireRelease(
+      Effect.promise(() => tmpdir()),
+      (tmp) => Effect.promise(() => tmp[Symbol.asyncDispose]()),
+    ).pipe(
+      Effect.flatMap((tmp) => {
+        const global = path.join(tmp.path, "global")
+        const project = path.join(tmp.path, "repo")
+        const directory = path.join(project, "src")
+        const globalLearnings = path.join(global, "learnings.md")
+        const projectLearnings = path.join(project, ".osta", "learnings.md")
+        const old = Array.from({ length: 2_000 }, (_, index) => `- old lesson ${index}`).join("\n")
+        return Effect.gen(function* () {
+          yield* Effect.promise(async () => {
+            await fs.mkdir(global, { recursive: true })
+            await fs.mkdir(directory, { recursive: true })
+            await fs.mkdir(path.dirname(projectLearnings), { recursive: true })
+            await fs.writeFile(globalLearnings, "- Muhammad prefers Egyptian Arabic replies")
+            await fs.writeFile(projectLearnings, `${old}\n- newest lesson`)
+          })
+
+          const discovery = yield* start()
+          const text = (yield* readInitial(yield* discovery.load())).text
+          expect(text).toContain(`Instructions from: ${globalLearnings}\nLessons Osta recorded in earlier work`)
+          expect(text).toContain("- Muhammad prefers Egyptian Arabic replies")
+          // The project file is over the cap: the newest lessons stay, the oldest are trimmed.
+          expect(text).toContain(`Instructions from: ${projectLearnings}\n`)
+          expect(text).toContain("(Older lessons trimmed to fit.)")
+          expect(text).toContain("- newest lesson")
+          expect(text).not.toContain("- old lesson 0\n")
+
+          yield* Effect.promise(() => fs.writeFile(globalLearnings, "- Run bun test from the package directory"))
+          yield* emitAndWait({ type: "update", path: globalLearnings })
+          const changed = (yield* readUpdate(yield* discovery.load(), yield* readInitial(yield* discovery.load())))
+            .text
+          expect(changed).not.toContain("Muhammad prefers")
+        }).pipe(
+          Effect.provide(
+            instructionLayer({
+              config: global,
+              home: path.join(tmp.path, "home"),
               locationServiceLayer: Layer.succeed(
                 Location.Service,
                 Location.Service.of(
@@ -516,6 +575,8 @@ describe("ConfigInstructionPlugin.Plugin", () => {
             { path: path.join(directory, "AGENTS.md"), type: "file" },
             { path: path.join(project, "packages", "AGENTS.md"), type: "file" },
             { path: path.join(project, "AGENTS.md"), type: "file" },
+            { path: path.join(global, "learnings.md"), type: "file" },
+            { path: path.join(project, ".osta", "learnings.md"), type: "file" },
           ])
         }).pipe(
           Effect.provide(

@@ -173,7 +173,7 @@ test("proactively syncs project metadata most recently active first", async () =
       {
         id: "proj_test",
         canonical: worktree,
-        name: "OpenCode",
+        name: "Osta",
         time: { created: 1, updated: 2, active: 2 },
         sandboxes: [],
       },
@@ -211,7 +211,7 @@ test("proactively syncs project metadata most recently active first", async () =
       {
         id: "proj_test",
         canonical: worktree,
-        name: "OpenCode",
+        name: "Osta",
         time: { created: 1, updated: 2, active: 2 },
         sandboxes: [],
       },

@@ -219,7 +219,7 @@ function LiveActivity() {
 }
 
 export default {
-  title: "OpenCode/Session/Activity chips",
+  title: "Osta/Session/Activity chips",
   id: "session-activity-chips",
   render: (args: PreviewArgs) => <Preview {...args} />,
   args: { stage: 0, subagents: 0, shells: 0 },

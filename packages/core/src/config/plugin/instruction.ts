@@ -11,6 +11,7 @@ import { Config } from "../../config.js"
 import { Watcher } from "../../filesystem/watcher.js"
 import { InstructionDiscovery } from "../../instruction-discovery.js"
 import { Instructions } from "../../instructions/index.js"
+import { Learnings } from "../../learnings.js"
 import { Location } from "../../location.js"
 
 type Loaded =
@@ -39,6 +40,12 @@ export const Plugin = define({
       const project = discovery.project && FSUtil.contains(root, start)
       const stop = FSUtil.contains(home, start) ? home : root
       const globalFile = yield* fs.resolve(join(global.config, "AGENTS.md"))
+      const learningFiles = Learnings.disabled()
+        ? []
+        : [
+            ...(discovery.global ? [yield* fs.resolve(join(global.config, Learnings.filename))] : []),
+            ...(project ? [join(root, Learnings.projectDirectory, Learnings.filename)] : []),
+          ]
       const loaded: { current: Loaded } = { current: { type: "available", files: [] } }
       const configured: { sources: string[]; remote: Map<string, InstructionDiscovery.File> } = {
         sources: [],
@@ -55,6 +62,7 @@ export const Plugin = define({
               .map((directory) => join(directory, "AGENTS.md"))
               .filter((file) => discovery.global || file !== globalFile)
           : []),
+        ...learningFiles,
       ]
       for (const file of new Set(candidates)) {
         const updates = yield* watcher.subscribe({ path: file, type: "file" })
@@ -91,6 +99,14 @@ export const Plugin = define({
         const files = yield* Effect.forEach(discovered, read, { concurrency: "unbounded" })
         if (files.some((file) => file === undefined)) return Instructions.unavailable
         return files.filter((file) => file instanceof InstructionDiscovery.File)
+      })
+
+      const learningsSource = Effect.fn("ConfigInstructionPlugin.learningsSource")(function* () {
+        const present = yield* Effect.filter(new Set(learningFiles), fs.isFile)
+        const files = yield* Effect.forEach(present, read, { concurrency: "unbounded" })
+        return files
+          .filter((file) => file instanceof InstructionDiscovery.File)
+          .map((file) => new InstructionDiscovery.File({ path: file.path, content: Learnings.present(file.content) }))
       })
 
       // Relative patterns search upward from the location to the project root. Without
@@ -192,11 +208,18 @@ export const Plugin = define({
           const sources = yield* Effect.all({
             global: isolate("global", globalSource()),
             project: isolate("project", projectSource()),
+            learnings: isolate("learnings", learningsSource()),
             configured: isolate("configured", configuredSource()),
           })
           loaded.current =
-            Array.isArray(sources.global) && Array.isArray(sources.project) && Array.isArray(sources.configured)
-              ? { type: "available", files: [...sources.global, ...sources.project, ...sources.configured] }
+            Array.isArray(sources.global) &&
+            Array.isArray(sources.project) &&
+            Array.isArray(sources.learnings) &&
+            Array.isArray(sources.configured)
+              ? {
+                  type: "available",
+                  files: [...sources.global, ...sources.project, ...sources.learnings, ...sources.configured],
+                }
               : { type: "unavailable" }
           if (!file) return
           yield* Effect.logDebug("instructions rescanned", {

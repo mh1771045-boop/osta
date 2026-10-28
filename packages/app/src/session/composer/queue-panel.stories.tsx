@@ -23,7 +23,7 @@ const view = (count: () => number): SessionQueueView => ({
 })
 
 export default {
-  title: "OpenCode/Session/Queue panel",
+  title: "Osta/Session/Queue panel",
   id: "session-queue-panel",
   render: (args: { count: number }) => (
     <div class="w-[560px]">

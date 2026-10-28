@@ -39,6 +39,7 @@ export function executeCallSummary(call: ExecuteCall) {
 
 export function webSearchProviderName(provider: unknown) {
   if (typeof provider !== "string" || !provider) return ""
+  // osta-keep: the opencode web search service keeps its own name.
   if (provider === "opencode") return "OpenCode"
   return `${provider[0].toUpperCase()}${provider.slice(1)}`
 }

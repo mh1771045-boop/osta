@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "opencode",
-  "description": "AI-powered development tool",
-  "version": "2.2.0",
+  "name": "osta",
+  "description": "Osta (أسطى): open-source AI coding agent based on opencode",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "packageManager": "bun@1.4.4",
@@ -133,7 +133,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/anomalyco/opencode"
+    "url": "https://github.com/mh1771045-boop/osta"
   },
   "license": "MIT",
   "prettier": {

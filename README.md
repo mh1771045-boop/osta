@@ -1,114 +1,83 @@
 <p align="center">
-  <a href="https://opencode.ai">
-    <picture>
-      <source srcset="packages/console/app/src/asset/logo-ornate-dark.svg" media="(prefers-color-scheme: dark)">
-      <source srcset="packages/console/app/src/asset/logo-ornate-light.svg" media="(prefers-color-scheme: light)">
-      <img src="packages/console/app/src/asset/logo-ornate-light.svg" alt="OpenCode logo">
-    </picture>
-  </a>
+  <picture>
+    <source srcset=".github/assets/osta-dark.svg" media="(prefers-color-scheme: dark)">
+    <source srcset=".github/assets/osta-light.svg" media="(prefers-color-scheme: light)">
+    <img src=".github/assets/osta-light.svg" alt="Osta" width="342">
+  </picture>
 </p>
-<p align="center">The open source AI coding agent.</p>
+<p align="center"><b>Osta (أسطى)</b>: an open-source AI coding agent that works like a master craftsman.<br>Free models out of the box. No account, no API key.</p>
 <p align="center">
-  <a href="https://opencode.ai/discord"><img alt="Discord" src="https://img.shields.io/discord/1391832426048651334?style=flat-square&label=discord" /></a>
-  <a href="https://www.npmjs.com/package/@opencode/cli"><img alt="npm" src="https://img.shields.io/npm/v/@opencode/cli?style=flat-square" /></a>
-  <a href="https://github.com/anomalyco/opencode/actions/workflows/release.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/anomalyco/opencode/release.yml?style=flat-square&branch=dev" /></a>
+  <a href="README.md">English</a> | <a href="README.ar.md">العربية</a>
 </p>
-
-<p align="center">
-  <a href="README.md">English</a> |
-  <a href="README.zh.md">简体中文</a> |
-  <a href="README.zht.md">繁體中文</a> |
-  <a href="README.ko.md">한국어</a> |
-  <a href="README.de.md">Deutsch</a> |
-  <a href="README.es.md">Español</a> |
-  <a href="README.fr.md">Français</a> |
-  <a href="README.it.md">Italiano</a> |
-  <a href="README.da.md">Dansk</a> |
-  <a href="README.ja.md">日本語</a> |
-  <a href="README.pl.md">Polski</a> |
-  <a href="README.ru.md">Русский</a> |
-  <a href="README.bs.md">Bosanski</a> |
-  <a href="README.ar.md">العربية</a> |
-  <a href="README.no.md">Norsk</a> |
-  <a href="README.br.md">Português (Brasil)</a> |
-  <a href="README.th.md">ไทย</a> |
-  <a href="README.tr.md">Türkçe</a> |
-  <a href="README.uk.md">Українська</a> |
-  <a href="README.bn.md">বাংলা</a> |
-  <a href="README.gr.md">Ελληνικά</a> |
-  <a href="README.vi.md">Tiếng Việt</a>
-</p>
-
-[![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---
 
-### Installation
+"Osta" is what Egyptians call a master craftsman: someone who does the job right the first time, quickly, and without being watched. Osta is a coding agent for your terminal built on [opencode](https://github.com/anomalyco/opencode). It does everything opencode does, adds its own way of working, and remembers what it learns from every project.
+
+### Install
+
+macOS and Linux:
 
 ```bash
-# YOLO
-curl -fsSL https://opencode.ai/v2/install | bash
-
-# Package managers
-npm i -g @opencode/cli@latest      # or bun/pnpm/yarn
-brew install anomalyco/tap/opencode-v2 # macOS and Linux (recommended, always up to date)
-brew install opencode              # macOS and Linux (official brew formula, updated less)
-sudo pacman -S opencode            # Arch Linux (Stable)
-paru -S opencode-beta              # Arch Linux (Latest from AUR)
-mise use -g opencode               # Any OS
-nix run github:anomalyco/opencode  # Nix
+curl -fsSL https://raw.githubusercontent.com/mh1771045-boop/osta/main/install | bash
 ```
 
-> [!TIP]
-> Remove versions older than 0.1.x before installing.
+Windows: run the same command in Git Bash or WSL.
 
-### Desktop App (BETA)
-
-OpenCode is also available as a desktop application. Download it from [opencode.ai/download](https://opencode.ai/download).
-
-| Platform              | Download                           |
-| --------------------- | ---------------------------------- |
-| macOS (Apple Silicon) | `opencode-desktop-mac-arm64.dmg`   |
-| macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
-| Windows               | `opencode-desktop-win-x64.exe`     |
-| Linux                 | `.deb`, `.rpm`, or `.AppImage`     |
+Then open a new terminal, go to a project folder and run:
 
 ```bash
-# macOS (Homebrew)
-brew install --cask opencode-desktop
+osta
 ```
 
-#### Installation Directory
+Prebuilt downloads for every platform are on the [Releases page](https://github.com/mh1771045-boop/osta/releases).
 
-The install script installs OpenCode to `$HOME/.opencode/bin`.
+### Free, with no API key
 
-### Agents
+Osta starts with free models and never asks for a key on first run.
 
-OpenCode includes two built-in agents you can switch between with the `Tab` key.
+- **Built-in free models.** They come from the free tier of OpenCode Zen, the model service run by the opencode team. The models on offer, their limits and their data policy are set by that service and can change.
+- **GitHub Copilot Free.** Run `osta auth login`, pick GitHub Copilot, and sign in with your GitHub account in the browser.
+- **Local models.** Run models on your own machine with Ollama or LM Studio and add them as a provider. Osta uses the same provider config as opencode ([OpenCode V2 docs](https://opencode.ai/v2/docs/)).
 
-- **build** - Default, full-access agent for development work
-- **plan** - Read-only agent for analysis and code exploration
-  - Denies file edits by default
-  - Asks permission before running bash commands
-  - Ideal for exploring unfamiliar codebases or planning changes
+Paid providers such as Anthropic, OpenAI and Google work too, but you never need them.
 
-Also included is a **general** subagent for complex searches and multistep tasks.
-This is used internally and can be invoked using `@general` in messages.
+### What Osta adds to opencode
 
-Learn more about [agents](https://opencode.ai/v2/docs/agents).
+| | |
+|---|---|
+| **A craftsman's way of working** | Every model gets the same loop: understand, decide, act, verify, report, learn. Osta proves a change works (tests, types, build) before saying it does, and says plainly what it could not check. |
+| **Learning memory** | After meaningful work Osta writes short lessons to `.osta/learnings.md` in the project, or to `~/.config/osta/learnings.md` when a lesson applies everywhere. Both load at the start of every session, newest lessons first when space runs out. They are plain Markdown you can read, edit or delete. Set `OSTA_DISABLE_LEARNINGS=1` to turn it off. |
+| **Arabic and English** | Osta replies in the language you write in, including natural Egyptian Arabic, while code, comments and commits stay in English. |
+| **Its own home, compatible with opencode** | Settings live in `~/.config/osta`, `osta.json` and `.osta/`. Your existing `opencode.json`, `.opencode/` and `AGENTS.md` files keep working. `OSTA_*` environment variables work wherever opencode reads `OPENCODE_*`. |
 
-### Documentation
+Everything else comes from opencode: the terminal UI, the `build` and `plan` agents, subagents, 75+ providers, MCP servers, LSP, plugins, themes, sessions, `osta run` for scripts, and `osta serve` / `osta pair` to use Osta from a browser.
 
-For more info on how to configure OpenCode, [**head over to our docs**](https://opencode.ai/v2/docs).
+### Use it from your phone
 
-### Contributing
+Osta runs on a computer. To drive it from your phone on the same Wi-Fi, run `osta service set hostname 0.0.0.0` once on that computer, then `osta pair`, and open the link it prints in your phone's browser. `osta pair --remote` gives a link that works from anywhere; it asks first because it exposes your machine to the internet.
 
-If you're interested in contributing to OpenCode, please read our [contributing docs](./CONTRIBUTING.md) before submitting a pull request.
+### Build from source
 
-### Building on OpenCode
+You need [Bun](https://bun.sh) 1.4.4 or newer.
 
-If you are working on a project that's related to OpenCode and is using "opencode" as part of its name, for example "opencode-dashboard" or "opencode-mobile", please add a note to your README to clarify that it is not built by the OpenCode team and is not affiliated with us in any way.
+```bash
+git clone https://github.com/mh1771045-boop/osta.git
+cd osta
+bun install
+bun dev            # run Osta from source
+cd packages/cli && bun run script/build.ts --single   # build a binary for this machine
+```
 
----
+`script/osta/rebrand.ts` re-applies Osta's naming after merging changes from upstream opencode.
 
-**Join our community** [Discord](https://discord.gg/opencode) | [X.com](https://x.com/opencode)
+### Known limitations
+
+- Some parts of the web and desktop apps still show opencode artwork, such as the animated wordmark on the new-session screen. The terminal app, CLI and sign-in pages are fully Osta.
+- Osta is not published to npm, Homebrew or WinGet yet. Install it with the script above or from Releases.
+
+### Credits and license
+
+Osta is based on [opencode](https://github.com/anomalyco/opencode) by Anomaly, released under the MIT license. Osta is also MIT licensed; see [LICENSE](LICENSE). Osta is an independent project and is not affiliated with or endorsed by the opencode team.
+
+Made by Muhammad Elsheikh · [WhatsApp](https://wa.me/201206580045)

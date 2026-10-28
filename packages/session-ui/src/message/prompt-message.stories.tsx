@@ -7,7 +7,7 @@ import { CurrentSessionProviders } from "../storybook/current-session-story"
 import { CURRENT_SESSION_ID, STORY_MODEL, STORY_TIME } from "../storybook/current-session-fixtures"
 
 export default {
-  title: "OpenCode/Conversation/Prompt message",
+  title: "Osta/Conversation/Prompt message",
   id: "current-prompt-message",
   parameters: { layout: "fullscreen" },
 }
