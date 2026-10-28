@@ -1,5 +1,5 @@
 import { For, onCleanup, onMount } from "solid-js"
-import type { PinBoardHandle } from "./pin-board"
+import { COLS, type PinBoardHandle } from "./pin-board"
 import { PinSound } from "./pin-sound"
 import type { LodgerBall } from "./wordmark"
 
@@ -108,11 +108,11 @@ function mountGame(
     // Walls sit on the wordmark's outer pin edges, using the board's integer pitch and rounded origin, so the
     // ball can only reach the top by breaking through.
     const logo = panel.querySelector('[data-slot="wordmark-box"]')?.getBoundingClientRect()
-    const pitch = logo ? Math.max(3, Math.round(logo.width / 78)) : 0
-    const x0 = logo ? Math.round(logo.left - r.left + (logo.width - pitch * 78) / 2) : 0
+    const pitch = logo ? Math.max(3, Math.round(logo.width / COLS)) : 0
+    const x0 = logo ? Math.round(logo.left - r.left + (logo.width - pitch * COLS) / 2) : 0
     const c = composerBox()
     view.l = logo ? x0 : Math.max(0, c.x)
-    view.r = logo ? x0 + pitch * 78 : Math.min(view.w, c.x + c.w)
+    view.r = logo ? x0 + pitch * COLS : Math.min(view.w, c.x + c.w)
     parts.walls[0].style.transform = `translateX(${view.l - 1}px)`
     parts.walls[1].style.transform = `translateX(${view.r}px)`
     pad.w = Math.max(84, Math.min(136, (view.r - view.l) * 0.15))
@@ -283,7 +283,7 @@ function mountGame(
       }
       if (b.y - r > view.h) {
         setPhase("miss")
-        if (sound()) PinSound.sweep({ duration: 0.45, columns: 78, reverse: true })
+        if (sound()) PinSound.sweep({ duration: 0.45, columns: COLS, reverse: true })
         return
       }
     }
@@ -311,7 +311,7 @@ function mountGame(
     parts.paddle.style.background = surface
     board.restore()
     ball.done()
-    if (sound()) PinSound.sweep({ duration: 0.9, columns: 78, reverse: kind !== "win" })
+    if (sound()) PinSound.sweep({ duration: 0.9, columns: COLS, reverse: kind !== "win" })
   }
 
   // The paddle grows back into the composer, then the composer content fades in over it.

@@ -25,6 +25,8 @@ jobs:
         uses: ./.github/actions/setup-bun
       - name: No opencode naming left in user-visible text
         run: bun script/osta/rebrand.ts --check
+      - name: Wordmark files match the terminal logo
+        run: bun script/osta/wordmark.ts --check
       - name: Osta tests
         run: |
           set -e

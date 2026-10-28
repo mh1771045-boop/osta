@@ -1,69 +1,32 @@
 import { Logo } from "@opencode/ui/logo"
+import { HEIGHT, LETTERS as GEOMETRY_LETTERS, PINS, WIDTH } from "@opencode/ui/wordmark-geometry"
 import { prefersReducedMotion } from "@opencode/ui/motion"
 import { For, onCleanup, onMount, Show } from "solid-js"
 import { PinSound } from "./pin-sound"
 import "./wordmark.css"
 
-// Each letter in the 234×42 logo viewBox, with its counter shadow, stem, and bottom-centre pivot.
-const LETTERS = [
-  {
-    cx: 12,
-    weak: "M18 30H6V18H18V30Z",
-    fill: "var(--icon-base)",
-    stem: "M18 12H6V30H18V12ZM24 36H0V6H24V36Z",
-  },
-  {
-    cx: 42,
-    weak: "M48 30H36V18H48V30Z",
-    fill: "var(--icon-base)",
-    stem: "M36 30H48V12H36V30ZM54 36H36V42H30V6H54V36Z",
-  },
-  {
-    cx: 72,
-    weak: "M84 24V30H66V24H84Z",
-    fill: "var(--icon-base)",
-    stem: "M84 24H66V30H84V36H60V6H84V24ZM66 18H78V12H66V18Z",
-  },
-  {
-    cx: 102,
-    weak: "M108 36H96V18H108V36Z",
-    fill: "var(--icon-base)",
-    stem: "M108 12H96V36H90V6H108V12ZM114 36H108V12H114V36Z",
-  },
-  {
-    cx: 132,
-    weak: "M144 30H126V18H144V30Z",
-    fill: "var(--icon-strong-base)",
-    stem: "M144 12H126V30H144V36H120V6H144V12Z",
-  },
-  {
-    cx: 162,
-    weak: "M168 30H156V18H168V30Z",
-    fill: "var(--icon-strong-base)",
-    stem: "M168 12H156V30H168V12ZM174 36H150V6H174V36Z",
-  },
-  {
-    cx: 192,
-    weak: "M198 30H186V18H198V30Z",
-    fill: "var(--icon-strong-base)",
-    stem: "M198 12H186V30H198V12ZM204 36H180V6H198V0H204V36Z",
-  },
-  {
-    cx: 222,
-    weak: "M234 24V30H216V24H234Z",
-    fill: "var(--icon-strong-base)",
-    stem: "M216 12V18H228V12H216ZM234 24H216V30H234V36H210V6H234V24Z",
-  },
-] as const
+// Each letter of the shared wordmark geometry, with its counter shadow, stem, and bottom-centre pivot.
+const LETTERS = GEOMETRY_LETTERS.map((letter) => ({
+  cx: letter.x + 12,
+  weak: letter.shadow,
+  fill: letter.side === "left" ? "var(--icon-base)" : "var(--icon-strong-base)",
+  stem: letter.body,
+}))
+/** The lodger lives in the last letter's counter. */
+const LAST = LETTERS.length - 1
+const LAST_X = GEOMETRY_LETTERS[LAST].x
+// The board is one pin per 3 viewBox units.
+const COLS = PINS[0].length
+const ROWS = PINS.length
 
-// Lodger geometry, in the logo's 234×42 viewBox units. The lodger is drawn from its bottom centre.
-const W = 234
-const H = 42
-const HOLE = { x: 222, y: 15 }
-const REST = { x: 222, y: 21 }
-const PIN_SLOT = { x: 226.5, y: 10.5 }
+// Lodger geometry, in the logo's viewBox units. The lodger is drawn from its bottom centre.
+const W = WIDTH
+const H = HEIGHT
+const HOLE = { x: LAST_X + 12, y: 15 }
+const REST = { x: LAST_X + 12, y: 21 }
+const PIN_SLOT = { x: LAST_X + 16.5, y: 10.5 }
 const GROUND = 36
-const HOME = 246
+const HOME = W + 12
 const POP = 26
 const SLIP = 60
 const HOLE_MAGNET = 24
@@ -110,7 +73,7 @@ type Parts = {
 
 /**
  * Reserves the wordmark's space. With `pins`, `NewSessionPinBoard` draws the logo into it. Otherwise it shows
- * the flat logo, and something lives in the top counter of the final "e".
+ * the flat logo, and something lives in the top counter of the final "a".
  */
 export function NewSessionWordmark(props: {
   ref: (element: HTMLDivElement) => void
@@ -137,7 +100,7 @@ export function NewSessionWordmark(props: {
           props.ref(el)
         }}
         data-slot="wordmark-box"
-        class="relative mx-auto aspect-[234/42] w-4/5"
+        class="relative mx-auto aspect-[114/42] w-[39%]"
       >
         <Show when={lodger}>
           <WordmarkLodger
@@ -155,9 +118,9 @@ export function NewSessionWordmark(props: {
 }
 
 /**
- * Eyes peek out of the "e" when the pointer comes near. Dragging them pulls the lodger and a single corner pin
+ * Eyes peek out of the "a" when the pointer comes near. Dragging them pulls the lodger and a single corner pin
  * out on a stretchy neck; pull far enough and that pin triggers an elastic 3D pull-wave across the wordmark.
- * Dragging the lodger back into the "e" hole reels all the pins back into the flat wordmark.
+ * Dragging the lodger back into the "a" hole reels all the pins back into the flat wordmark.
  */
 function WordmarkLodger(props: {
   box: HTMLDivElement
@@ -196,7 +159,7 @@ function WordmarkLodger(props: {
   return (
     <div ref={stage} class="absolute">
       <div ref={flat} data-slot="wordmark-flat" class="absolute inset-0">
-        <svg viewBox="0 0 234 42" fill="none" class="block size-full overflow-visible">
+        <svg viewBox={`0 0 ${W} ${H}`} fill="none" class="block size-full overflow-visible">
           <For each={LETTERS}>
             {(item, i) => (
               <g ref={(el) => (letters[i()] = el)}>
@@ -204,11 +167,11 @@ function WordmarkLodger(props: {
                   <path d={item.weak} fill="var(--icon-weak-base)" />
                   <path d={item.stem} fill={item.fill} />
                 </g>
-                <Show when={i() === 7}>
+                <Show when={i() === LAST}>
                   <rect
                     ref={notch}
-                    x="224.6"
-                    y="8.6"
+                    x={PIN_SLOT.x - 1.9}
+                    y={PIN_SLOT.y - 1.9}
                     width="3.8"
                     height="3.8"
                     fill="var(--v2-background-bg-base)"
@@ -224,7 +187,7 @@ function WordmarkLodger(props: {
       <svg
         ref={svg}
         data-slot="wordmark-lodger"
-        viewBox="0 0 234 42"
+        viewBox={`0 0 ${W} ${H}`}
         class="absolute inset-0 size-full overflow-visible"
       >
         <line ref={neck} stroke="var(--lodger-body)" stroke-linecap="round" style={{ opacity: 0 }} />
@@ -334,24 +297,28 @@ function mountLodger(
     const l = parts.box.getBoundingClientRect()
     if (!l.width) return
     const s = parts.box.closest('[data-component="new-session"]')?.getBoundingClientRect()
-    const pitch = Math.max(3, Math.round(l.width / 78))
-    const x = s ? Math.round(l.left - s.left + (l.width - pitch * 78) / 2) - (l.left - s.left) : (l.width - pitch * 78) / 2
-    const y = s ? Math.round(l.top - s.top + (l.height - pitch * 14) / 2) - (l.top - s.top) : (l.height - pitch * 14) / 2
+    const pitch = Math.max(3, Math.round(l.width / COLS))
+    const x = s
+      ? Math.round(l.left - s.left + (l.width - pitch * COLS) / 2) - (l.left - s.left)
+      : (l.width - pitch * COLS) / 2
+    const y = s
+      ? Math.round(l.top - s.top + (l.height - pitch * ROWS) / 2) - (l.top - s.top)
+      : (l.height - pitch * ROWS) / 2
     parts.stage.style.left = `${x}px`
     parts.stage.style.top = `${y}px`
-    parts.stage.style.width = `${pitch * 78}px`
-    parts.stage.style.height = `${pitch * 14}px`
+    parts.stage.style.width = `${pitch * COLS}px`
+    parts.stage.style.height = `${pitch * ROWS}px`
     measure()
   }
 
-  // Moves the interactive hit box between the "e" counter (when hidden) and HOME (when perched beside the board).
+  // Moves the interactive hit box between the "a" counter (when hidden) and HOME (when perched beside the board).
   const placeGrip = (where: "hidden" | "idle" | "none") => {
     if (where === "none") {
       parts.grip.style.display = "none"
       return
     }
     parts.grip.style.display = ""
-    const box = where === "hidden" ? { x: 213, y: 8, w: 18, h: 14 } : { x: 234, y: 18, w: 24, h: 24 }
+    const box = where === "hidden" ? { x: LAST_X + 3, y: 8, w: 18, h: 14 } : { x: W, y: 18, w: 24, h: 24 }
     parts.grip.style.left = `${(box.x / W) * 100}%`
     parts.grip.style.top = `${(box.y / H) * 100}%`
     parts.grip.style.width = `${(box.w / W) * 100}%`
@@ -409,10 +376,10 @@ function mountLodger(
     c.pinY = lerp(PIN_SLOT.y, c.y - 11, clamp01(out / 7))
     c.pinRot = (c.x - REST.x) * 2.5
     c.pinScale = 1 + stress * 0.35
-    poses[7].x = (c.x - REST.x) * 0.12
-    poses[7].y = (c.y - REST.y) * 0.12
-    poses[7].sx = 1 + stress * 0.05
-    poses[7].sy = 1 + stress * 0.05
+    poses[LAST].x = (c.x - REST.x) * 0.12
+    poses[LAST].y = (c.y - REST.y) * 0.12
+    poses[LAST].sx = 1 + stress * 0.05
+    poses[LAST].sy = 1 + stress * 0.05
   }
 
   const snapIn = (dt: number) => {
@@ -501,7 +468,7 @@ function mountLodger(
     { at: 1.95, run: () => blinkOnce() },
   ]
 
-  // Pulling one single pin out of the "e" triggers an elastic 3D pull-wave that pops every pin out toward
+  // Pulling one single pin out of the "a" triggers an elastic 3D pull-wave that pops every pin out toward
   // the viewer from right to left, then the lodger hops up to slot its starter pin back in.
   const show = (t: number) => {
     while (c.cue < showCues.length && t >= showCues[c.cue].at) showCues[c.cue++].run()
@@ -511,7 +478,7 @@ function mountLodger(
     c.pinOpacity = t < 1.35 ? 1 : 0
 
     poses.forEach((p, i) => {
-      const start = (7 - i) * 0.08
+      const start = (LAST - i) * 0.08
       const u = seg(t, start, start + 0.28)
       p.opacity = 1 - u
       p.x = 0
@@ -542,7 +509,7 @@ function mountLodger(
     }
     if (t < 1.35) {
       const u = seg(t, 1.05, 1.35)
-      c.x = lerp(HOME, 233, easeInOut(u))
+      c.x = lerp(HOME, W - 1, easeInOut(u))
       c.y = lerp(GROUND, 18, easeOut(u)) - Math.sin(Math.PI * u) * 7
       c.pinX = lerp(HOME, PIN_SLOT.x, easeInOut(u))
       c.pinY = lerp(GROUND - 12.5, PIN_SLOT.y, easeInOut(u))
@@ -551,7 +518,7 @@ function mountLodger(
       return
     }
     const u = seg(t, 1.35, 1.72)
-    c.x = lerp(233, HOME, easeInOut(u))
+    c.x = lerp(W - 1, HOME, easeInOut(u))
     c.y = lerp(18, GROUND, u) - Math.sin(Math.PI * u) * 10
     c.squint = t > 1.72 ? 0.35 : 1
   }
@@ -581,7 +548,7 @@ function mountLodger(
     scheduleBlink()
   }
 
-  // Carrying the lodger from HOME: dangles under the pointer and looks toward the "e" hole.
+  // Carrying the lodger from HOME: dangles under the pointer and looks toward the "a" hole.
   const dragCarry = (dt: number) => {
     const dx = pointer.x - pointer.downX
     const dy = pointer.y - pointer.downY
@@ -715,21 +682,21 @@ function mountLodger(
     },
   ]
 
-  // Reverse sequence: the lodger hops into the "e" hole, grabs the corner pin, and reels all 800 pins
-  // from left ("o") back into the "e" before tucking itself back inside.
+  // Reverse sequence: the lodger hops into the "a" hole, grabs the corner pin, and reels all the pins
+  // from left ("o") back into the "a" before tucking itself back inside.
   const pack = (t: number) => {
     while (c.cue < packCues.length && t >= packCues[c.cue].at) packCues[c.cue++].run()
     if (t >= 1.2) return restHidden()
 
     poses.forEach((p, i) => {
-      const start = 0.32 + (i / 7) * 0.48
+      const start = 0.32 + (i / LAST) * 0.48
       const u = seg(t, start, start + 0.32)
       p.opacity = u
       p.x = 0
       p.y = 0
     })
 
-    // Hops from the cursor into the "e" counter and grabs the corner starter pin while any loose pins fly home.
+    // Hops from the cursor into the "a" counter and grabs the corner starter pin while any loose pins fly home.
     if (t < 0.3) {
       const u = t / 0.3
       c.x = lerp(c.fromX, REST.x, easeOut(u))
@@ -748,7 +715,7 @@ function mountLodger(
       c.pinScale = 1.3
       return
     }
-    // Reels the wave in from "o" -> "e" while holding the corner pin.
+    // Reels the wave in from "o" -> "a" while holding the corner pin.
     if (t < 0.9) {
       const u = seg(t, 0.3, 0.9)
       const tug = Math.sin(u * Math.PI * 3)
@@ -768,7 +735,7 @@ function mountLodger(
       c.pinScale = lerp(1.3, 1, u)
       return
     }
-    // Slots the corner pin flush and sinks back into the "e" hole.
+    // Slots the corner pin flush and sinks back into the "a" hole.
     const u = seg(t, 0.9, 1.14)
     c.x = REST.x
     c.y = lerp(REST.y - 1, REST.y, easeOut(u))
@@ -927,7 +894,7 @@ function mountLodger(
     pointer.y = (event.clientY - rect.top) / rect.scale
     pointer.inside = true
   }
-  // Pointer moves only schedule a frame when the lodger visibly changes; far from the "e" they do nothing.
+  // Pointer moves only schedule a frame when the lodger visibly changes; far from the "a" they do nothing.
   const onMove = (event: PointerEvent) => {
     toUnits(event)
     c.near = clamp01((24 - Math.hypot(pointer.x - HOLE.x, pointer.y - HOLE.y)) / 14)

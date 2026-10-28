@@ -1,11 +1,15 @@
 import type { Page } from "@playwright/test"
+import { PINS } from "@opencode/ui/wordmark-geometry"
 import { expect, story } from "../../stories/playwright/story"
 
-// A cell of the "c" in the wordmark (column 40, row 2 of the 78×14 pin grid).
-const PIN = { x: 40.5 / 78, y: 2.5 / 14 }
+const COLS = PINS[0].length
+const ROWS = PINS.length
+
+// A cell of the "t" stem in the wordmark (column 20, row 2 of the pin grid).
+const PIN = { x: 20.5 / COLS, y: 2.5 / ROWS }
 
 // An empty cell above the "o", clear of every pin, side and shadow at rest.
-const EMPTY = { x: 5.5 / 78, y: 0.5 / 14 }
+const EMPTY = { x: 5.5 / COLS, y: 0.5 / ROWS }
 
 story("draws the wordmark as pins and stops animating once settled", async ({ mount, page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" })

@@ -16,6 +16,8 @@ const packages = ["cli", "tui", "core", "server", "util", "client", "app", "ui",
 const skip = [
   /models-dev[/\\]snapshot/,
   /plugin[/\\]provider[/\\]/,
+  // Provider tests mirror those sources, which name the upstream services.
+  /test[/\\]plugin[/\\]provider-/,
   /github-copilot[/\\]/,
   /[/\\]node_modules[/\\]/,
   /[/\\]dist[/\\]/,

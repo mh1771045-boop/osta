@@ -6,7 +6,8 @@ import { rankSettings } from "./search-results"
 
 const strings = new Map(Object.entries({ ...dict, ...en }))
 
-const project = { id: "proj_opencode", name: "Osta", worktree: "/projects/opencode" }
+// osta-keep: a sample project that happens to be named OpenCode.
+const project = { id: "proj_opencode", name: "OpenCode", worktree: "/projects/opencode" }
 
 const servers: SettingsSearchServer[] = [
   { key: "local", name: "Local server", connected: true, projects: [project] },
