@@ -57,7 +57,7 @@ function format(input: unknown) {
 }
 
 export function file(local = true, channel = "local") {
-  if (!local) return path.join(Global.Path.log, "opencode.log")
+  if (!local) return path.join(Global.Path.log, "osta.log")
   return path.join(Global.Path.log, `opencode-${channel.replace(/[^a-zA-Z0-9._-]/g, "-")}.log`)
 }
 

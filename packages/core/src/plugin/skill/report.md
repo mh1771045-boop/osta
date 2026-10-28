@@ -73,7 +73,7 @@ otherwise:
 
 ## Environment
 
-- opencode version: <!-- value or Unavailable: reason -->
+- Osta version: <!-- value or Unavailable: reason -->
 - OS: <!-- value or Unavailable: reason -->
 - Terminal: <!-- value or Unavailable: reason -->
 - Shell: <!-- value or Unavailable: reason -->

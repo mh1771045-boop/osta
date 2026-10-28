@@ -4,7 +4,11 @@ Osta (أسطى) is built on OpenCode V2 and works the same way, so the OpenCode
 documentation below applies to Osta with these differences:
 
 - The command is `osta` instead of `opencode` (for example `osta auth login`).
-- Global settings live in `~/.config/osta`, data in `~/.local/share/osta`.
+  When the guide below shows an `opencode ...` command, run it as `osta ...`.
+- Global settings live in `~/.config/osta` (including `cli.json`), data in
+  `~/.local/share/osta`, and logs in `~/.local/share/osta/log/osta.log`. Read
+  every `~/.config/opencode`, `~/.local/share/opencode`, or `opencode.log` path
+  below with the Osta name.
 - Osta reads `osta.json`/`osta.jsonc` and `.osta/` next to the OpenCode names
   `opencode.json`, `opencode.jsonc`, and `.opencode/`, which keep working.
 - `OSTA_*` environment variables work wherever OpenCode reads `OPENCODE_*`.

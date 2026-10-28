@@ -49,7 +49,7 @@ const consoleDocument = (config: Config.Interface) =>
         entries.find((entry): entry is ConfigIntegration.Document => entry instanceof ConfigIntegration.Document),
       ),
     )
-const consoleSearch = { id: WebSearch.ID.make("opencode"), name: "Osta Web Search" }
+const consoleSearch = { id: WebSearch.ID.make("opencode"), name: "OpenCode Web Search" }
 const consolePolicies = (config: Config.Interface) =>
   consoleDocument(config).pipe(Effect.map((document) => document?.info.policies ?? []))
 
@@ -276,7 +276,7 @@ describe("OpencodePlugin", () => {
             if (orgID === "org-missing") {
               expect(status).toMatchObject({
                 status: "failed",
-                message: "Osta organization not found: org-missing",
+                message: "OpenCode organization not found: org-missing",
               })
               expect(yield* credentials.list(integrationID)).toEqual([])
               expect(config).toEqual([])
@@ -367,14 +367,14 @@ describe("OpencodePlugin", () => {
               ).toEqual(stored.value)
               expect(requests).toEqual(["/auth/device/token", "/api/v2/config"])
               // The refresh and the config fetch both say which OpenCode is asking.
-              expect(agents).toEqual(["opencode/beta/1.2.3/test", "opencode/beta/1.2.3/test"])
+              expect(agents).toEqual(["opencode/beta/1.2.3/test osta/1.2.3", "opencode/beta/1.2.3/test osta/1.2.3"])
             }).pipe(Effect.provideService(App.Metadata, App.make({ name: "test", version: "1.2.3", channel: "beta" }))),
           ({ server }) => Effect.promise(() => server.stop(true)),
         ),
     )
   }
 
-  it.effect("rejects non-HTTP Osta servers", () =>
+  it.effect("rejects non-HTTP OpenCode servers", () =>
     Effect.gen(function* () {
       yield* addPlugin()
       const integrations = yield* Integration.Service
@@ -386,11 +386,11 @@ describe("OpencodePlugin", () => {
         })
         .pipe(Effect.flip)
       expect(error).toBeInstanceOf(Integration.AuthorizationError)
-      expect(String(error.cause)).toContain("Invalid Osta server URL: expected HTTP(S)")
+      expect(String(error.cause)).toContain("Invalid OpenCode server URL: expected HTTP(S)")
     }),
   )
 
-  it.effect("rejects non-string Osta servers", () =>
+  it.effect("rejects non-string OpenCode servers", () =>
     Effect.gen(function* () {
       yield* addPlugin()
       const integrations = yield* Integration.Service
@@ -406,7 +406,7 @@ describe("OpencodePlugin", () => {
     }),
   )
 
-  it.live("loads native V2 providers and models from the connected Osta server", () =>
+  it.live("loads native V2 providers and models from the connected OpenCode server", () =>
     Effect.acquireUseRelease(
       Effect.sync(() => {
         const authorization: Array<string | null> = []
@@ -1154,7 +1154,7 @@ describe("OpencodePlugin", () => {
     ),
   )
 
-  it.live("loads and executes hosted web search from the connected Osta server", () =>
+  it.live("loads and executes hosted web search from the connected OpenCode server", () =>
     Effect.acquireUseRelease(
       Effect.sync(() => {
         const requests: Array<{
@@ -1195,7 +1195,7 @@ describe("OpencodePlugin", () => {
                 results: [
                   {
                     url: "https://github.com/anomalyco/opencode",
-                    title: "Osta",
+                    title: "OpenCode",
                     content: "Open source AI coding agent.",
                     time: { published: 1_700_000_000_000 },
                   },
@@ -1228,7 +1228,7 @@ describe("OpencodePlugin", () => {
           yield* addPlugin()
           expect(yield* websearch.providers()).toContainEqual({
             id: WebSearch.ID.make("opencode"),
-            name: "Osta Web Search",
+            name: "OpenCode Web Search",
           })
           expect(yield* websearch.providers()).toContainEqual(consoleSearch)
           expect(yield* websearch.query({ query: "effect web search", providerID: consoleSearch.id })).toEqual(
@@ -1237,7 +1237,7 @@ describe("OpencodePlugin", () => {
               results: [
                 {
                   url: "https://github.com/anomalyco/opencode",
-                  title: "Osta",
+                  title: "OpenCode",
                   content: "Open source AI coding agent.",
                   time: { published: 1_700_000_000_000 },
                 },
@@ -1735,7 +1735,7 @@ describe("OpencodePlugin", () => {
     ),
   )
 
-  it.effect("ignores non-osta providers and models", () =>
+  it.effect("ignores non-opencode providers and models", () =>
     withEnv({ OPENCODE_API_KEY: undefined }, () =>
       Effect.gen(function* () {
         const catalog = yield* Provider.Service
@@ -2034,7 +2034,7 @@ describe("OpencodePlugin with a Console config", () => {
           const websearch = yield* WebSearch.Service
           const config = yield* Config.Test
           const bus = yield* Bus.Service
-          const opencode = { id: WebSearch.ID.make("opencode"), name: "Osta Web Search" }
+          const opencode = { id: WebSearch.ID.make("opencode"), name: "OpenCode Web Search" }
           // Config.testLayer does not announce integration changes the way config reloads do.
           const announced = (expected: typeof opencode | undefined) =>
             bus

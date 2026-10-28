@@ -61,7 +61,7 @@ const reportContentWithDiagnostics = Effect.fn("SkillPlugin.reportContentWithDia
     "",
     "These values were captured when the built-in report skill was registered. Verify them before publishing.",
     "",
-    `- opencode version: ${app.version}`,
+    `- Osta version: ${app.version}`,
     `- install/channel: ${app.channel}`,
     `- OS: ${os.type()} ${os.release()} (${os.platform()} ${os.arch()}${emulated ? ", emulated on ARM64" : ""})`,
     `- Terminal: ${terminal()}`,
