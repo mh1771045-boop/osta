@@ -8,29 +8,26 @@ jobs:
   probe:
     runs-on: ubuntu-24.04
     steps:
-      - name: OpenCode Zen preflight (browser CORS)
+      - name: Pollinations models
         run: |
-          curl -s -i -X OPTIONS https://opencode.ai/inference/openai/v1/chat/completions \
-            -H "Origin: https://mh1771045-boop.github.io" \
-            -H "Access-Control-Request-Method: POST" \
-            -H "Access-Control-Request-Headers: authorization,content-type" | head -30
-      - name: OpenCode Zen free model call
+          curl -s https://text.pollinations.ai/models -H "Origin: https://mh1771045-boop.github.io" | head -c 3000; echo
+      - name: Pollinations fresh Arabic request
         run: |
-          curl -s -i https://opencode.ai/inference/openai/v1/chat/completions \
-            -H "Origin: https://mh1771045-boop.github.io" \
-            -H "Authorization: Bearer public" -H "Content-Type: application/json" \
-            -d '{"model":"big-pickle","messages":[{"role":"user","content":"Reply with one short Arabic greeting."}],"max_tokens":60}' | head -c 1800; echo
-      - name: OpenCode Zen streaming call
+          n=$RANDOM$RANDOM
+          curl -s -i https://text.pollinations.ai/openai -H "Origin: https://mh1771045-boop.github.io" -H "Referer: https://mh1771045-boop.github.io/osta/" -H "Content-Type: application/json" \
+            -d "{\"model\":\"openai\",\"messages\":[{\"role\":\"system\",\"content\":\"You are Osta, a coding assistant. Reply in Egyptian Arabic.\"},{\"role\":\"user\",\"content\":\"اكتبلي دالة جافاسكريبت بتجمع رقمين. رقم الطلب $n\"}]}" | head -c 2500; echo
+      - name: Pollinations fresh streaming request
         run: |
-          curl -s -N https://opencode.ai/inference/openai/v1/chat/completions \
-            -H "Origin: https://mh1771045-boop.github.io" \
-            -H "Authorization: Bearer public" -H "Content-Type: application/json" \
-            -d '{"model":"big-pickle","stream":true,"messages":[{"role":"user","content":"Say hi"}],"max_tokens":30}' | head -c 1200; echo
-      - name: OpenCode Zen models list
+          n=$RANDOM$RANDOM
+          curl -s -N https://text.pollinations.ai/openai -H "Origin: https://mh1771045-boop.github.io" -H "Content-Type: application/json" \
+            -d "{\"model\":\"openai\",\"stream\":true,\"messages\":[{\"role\":\"user\",\"content\":\"Count from 1 to 5. id $n\"}]}" | head -c 1500; echo
+      - name: Pollinations second fresh request (rate limit check)
         run: |
-          curl -s -i https://opencode.ai/inference/openai/v1/models -H "Origin: https://mh1771045-boop.github.io" -H "Authorization: Bearer public" | head -c 2500; echo
-      - name: Pollinations
-        run: |
-          curl -s -i -X OPTIONS https://text.pollinations.ai/openai -H "Origin: https://mh1771045-boop.github.io" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type" | head -20
+          n=$RANDOM$RANDOM
           curl -s -i https://text.pollinations.ai/openai -H "Origin: https://mh1771045-boop.github.io" -H "Content-Type: application/json" \
-            -d '{"model":"openai","messages":[{"role":"user","content":"Say hi"}]}' | head -c 1200; echo
+            -d "{\"model\":\"openai\",\"messages\":[{\"role\":\"user\",\"content\":\"Say ok. id $n\"}]}" | head -c 1200; echo
+      - name: gen.pollinations.ai
+        run: |
+          n=$RANDOM$RANDOM
+          curl -s -i https://gen.pollinations.ai/v1/chat/completions -H "Origin: https://mh1771045-boop.github.io" -H "Content-Type: application/json" \
+            -d "{\"model\":\"openai\",\"messages\":[{\"role\":\"user\",\"content\":\"Say ok. id $n\"}]}" | head -c 1200; echo
