@@ -1,0 +1,25 @@
+// Open this repository in a GitHub Codespace and Osta starts by itself: the terminal app in the editor's
+// terminal and the web app in a new browser tab. Nothing to install.
+{
+  "name": "Osta",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  // Keep the editor waiting until Osta is installed, so the start task finds it.
+  "waitFor": "postCreateCommand",
+  "forwardPorts": [4096],
+  "portsAttributes": {
+    "4096": { "label": "Osta web app", "onAutoForward": "silent" }
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": [".devcontainer/WELCOME.md"]
+    },
+    "vscode": {
+      "settings": {
+        "task.allowAutomaticTasks": "on",
+        "workbench.startupEditor": "none",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

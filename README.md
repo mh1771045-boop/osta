@@ -14,6 +14,12 @@
 
 "Osta" is what Egyptians call a master craftsman: someone who does the job right the first time, quickly, and without being watched. Osta is a coding agent for your terminal built on [opencode](https://github.com/anomalyco/opencode). It does everything opencode does, adds its own way of working, and remembers what it learns from every project.
 
+### Try it now, nothing to install
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mh1771045-boop/osta?quickstart=1)
+
+Press the button, sign in to GitHub if asked, and wait a minute or two. Osta opens by itself in the terminal of a browser editor, and the terminal prints a link to Osta's web app, which works well on a phone. Codespaces is free for personal GitHub accounts up to a monthly limit.
+
 ### Install
 
 macOS and Linux:
