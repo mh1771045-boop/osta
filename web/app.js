@@ -3,7 +3,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const PUTER_SRC = "https://js.puter.com/v2/";
   const $ = (id) => document.getElementById(id);
 
@@ -59,7 +59,7 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
     chats: [],      // {id, title, updated, turns: [{role, content, note?, hadImage?}]}
     currentId: null,
     lessons: [],    // {d, t}
-    settings: { theme: "auto", tier: "best", installDismissed: false },
+    settings: { theme: "auto", tier: "light", installDismissed: false, v: 2 },
     busy: false,
     image: null,    // data URL for the next message
     pending: null,  // text waiting for sign-in
@@ -243,7 +243,8 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
         : "";
       els.messages.innerHTML = `<div class="welcome">${markSVG()}<h1>أهلاً، أنا أسطى</h1>
         <p>مساعد برمجة بيشتغل زي الأسطى الشاطر. اسألني بالعربي أو بالإنجليزي، وأنا بفتكر اللي بتعلّمه عنك.</p>
-        <div class="chips">${SUGGESTIONS.map((s) => `<button class="chip" data-suggest>${esc(s)}</button>`).join("")}</div>${installCard}</div>`;
+        <div class="chips">${SUGGESTIONS.map((s) => `<button class="chip" data-suggest>${esc(s)}</button>`).join("")}</div>
+        <button class="card study-card" data-study><span class="tile orange">${ICON_BOOK}</span><span class="grow"><span class="t">ذاكر وامتحن نفسك</span><span class="s">ارفع PDF أو صور، وأسطى يعملك امتحان ويصحّحه ويشرح.</span></span><svg class="chev" viewBox="0 0 8 13"><path d="M1.5 1.5l5 5-5 5"/></svg></button>${installCard}</div>`;
       return;
     }
     const lastAssistant = turns[turns.length - 1].role === "assistant" ? turns.length - 1 : -1;
@@ -255,6 +256,7 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
   function userHTML(t, cls) {
     return `<div class="msg user${cls}">${t.hadImage ? `<span class="note">صورة مرفقة</span>` : ""}<div class="bubble" dir="auto">${esc(t.content)}</div></div>`;
   }
+  const ICON_BOOK = `<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>`;
   const ICON_COPY = `<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>`;
   const ICON_RETRY = `<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg>`;
   function assistantHTML(t, last, cls) {
@@ -318,7 +320,7 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
   function errorCopy(kind) {
     switch (kind) {
       case "cancelled": return "وقّفته.";
-      case "funds": return "الرصيد المجاني لحسابك في Puter خلص الشهر ده. اختار «الأوفر» من الإعدادات وجرّب تاني، أو استنى لما الرصيد يتجدد.";
+      case "funds": return state.settings.tier === "light" ? "الرصيد المجاني لحسابك في Puter خلص. Puter بيجدده لوحده كل شهر، وبعدها أسطى هيرد تاني عادي." : "الرصيد المجاني لحسابك في Puter مش مكفّي النموذج ده. اختار «الأوفر» من الإعدادات وجرّب تاني.";
       case "auth": return "محتاج تسجّل دخول Puter تاني.";
       case "auth_canceled": return "مكمّلتش تسجيل الدخول. اضغط «كمّل» وجرّب تاني.";
       case "popup_blocked": return "المتصفح منع نافذة Puter. اسمح بالنوافذ المنبثقة للموقع ده، أو افتح أسطى في Chrome وسجّل منه مرة واحدة.";
@@ -495,6 +497,7 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
       if (last) copyText(splitLessons(last.content).shown, copyReply, "نسخ");
       return;
     }
+    if (t.closest("[data-study]")) { window.osta.openStudy?.(); return; }
     if (t.closest("[data-retry]")) { retry(); return; }
     if (t.closest("[data-open-settings]")) { showSheet("sheet-settings"); return; }
     if (t.closest("[data-signin]")) { showSheet("sheet-signin"); return; }
@@ -831,7 +834,10 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
   // ---- Start ----
   state.chats = load(K.chats, []);
   state.lessons = load(K.lessons, []);
-  state.settings = { ...state.settings, ...load(K.settings, {}) };
+  const stored = load(K.settings, null);
+  state.settings = { ...state.settings, ...stored };
+  // Version 2 made «الأوفر» the default, so the free credit lasts as long as possible.
+  if (stored && stored.v !== 2) { state.settings.tier = "light"; state.settings.v = 2; saveSettings(); }
   applyTheme();
   setStatus();
   if (new URLSearchParams(location.search).get("new") === "1") history.replaceState(null, "", location.pathname);
@@ -839,5 +845,10 @@ ${lessons.length ? lessons.map((l) => `- ${l.d}: ${l.t}`).join("\n") : "- Nothin
   loadPuter().then((p) => { if (p && signedIn()) refreshAccount(); });
 
   // For tests.
-  window.osta = { markdown, splitLessons, pickModel, modelLabel, version: VERSION };
+  // Shared with study.js, and used by the tests.
+  window.osta = {
+    markdown, splitLessons, pickModel, modelLabel, version: VERSION,
+    esc, toast, haptic, showSheet, loadPuter, signedIn, errorKind, errorCopy,
+    puter: () => puter, modelFor: () => modelFor(state.settings.tier),
+  };
 })();

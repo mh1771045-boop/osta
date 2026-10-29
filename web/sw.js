@@ -1,11 +1,12 @@
 // Osta's service worker: the app shell works offline, Puter's script and the fonts
 // are cached as they load, and a new version waits until the user taps «حدّث».
-const VERSION = "osta-web-1.0.0";
+const VERSION = "osta-web-1.1.0";
 const RUNTIME = "osta-web-runtime";
 const SHELL = [
   "./",
   "index.html",
   "app.js",
+  "study.js",
   "manifest.webmanifest",
   "icons/icon.svg",
   "icons/icon-32.png",
@@ -14,7 +15,7 @@ const SHELL = [
   "icons/icon-maskable-512.png",
   "icons/apple-touch-icon.png",
 ];
-const RUNTIME_HOSTS = new Set(["js.puter.com", "fonts.googleapis.com", "fonts.gstatic.com"]);
+const RUNTIME_HOSTS = new Set(["js.puter.com", "cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"]);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)));

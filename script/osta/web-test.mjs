@@ -47,6 +47,14 @@ const REPLY = [
   "",
   "LEARN: المستخدم بيكتب JavaScript",
 ].join("\n")
+const QUIZ = JSON.stringify({
+  title: "الخلية",
+  questions: [
+    { type: "mcq", q: "إيه وحدة بناء الكائن الحي؟", choices: ["الذرة", "الخلية", "العضو", "النسيج"], answer: 1, explain: "الملف بيقول إن الخلية هي وحدة بناء الكائن الحي." },
+    { type: "tf", q: "النواة بتتحكم في أنشطة الخلية.", answer: true, explain: "النواة هي مركز التحكم في الخلية." },
+    { type: "mcq", q: "فين بتتنتج الطاقة في الخلية؟", choices: ["النواة", "الجدار", "الميتوكوندريا", "الفجوة"], answer: 2, explain: "الميتوكوندريا هي بيت الطاقة." },
+  ],
+})
 const MODELS = ["gpt-5.4-nano", "gpt-5.4-mini", "gpt-5.4", "claude-sonnet-4-5", "claude-sonnet-4-6", "claude-sonnet-4-20250514", "claude-haiku-4-5", "gemini-2.5-pro", "gemini-2.5-flash", "openrouter:anthropic/claude-sonnet-9"]
 const FAKE_PUTER = `(() => {
   const ls = localStorage;
@@ -71,7 +79,8 @@ const FAKE_PUTER = `(() => {
         const mode = ls.getItem("mock.mode") || "ok";
         if (mode === "funds") throw { success: false, error: { code: "insufficient_funds", message: "Your account does not have enough funding." } };
         if (mode === "badmodel" && options?.model) throw { success: false, error: { code: "model_not_found", message: "Model not found" } };
-        const pieces = (ls.getItem("mock.reply") || ${JSON.stringify(REPLY)}).match(/[\\s\\S]{1,12}/g);
+        const quiz = typeof messages[0]?.content === "string" && messages[0].content.includes("Return only JSON");
+        const pieces = (quiz ? "\`\`\`json\\n" + ${JSON.stringify(QUIZ)} + "\\n\`\`\`" : ls.getItem("mock.reply") || ${JSON.stringify(REPLY)}).match(/[\\s\\S]{1,12}/g);
         const delay = Number(ls.getItem("mock.delay") || 5);
         return (async function* () {
           for (const piece of pieces) {
@@ -105,6 +114,7 @@ function assert(ok, message) {
 async function newContext(options = {}) {
   const context = await browser.newContext({ locale: "ar-EG", acceptDownloads: true, ...options })
   await context.route("https://js.puter.com/**", (route) => route.fulfill({ contentType: "text/javascript", body: FAKE_PUTER }))
+  await context.route("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/**", (route) => route.fulfill({ contentType: "text/javascript", body: readFileSync(pdfjsFile(route.request().url())) }))
   await context.route("https://fonts.googleapis.com/**", (route) => route.fulfill({ contentType: "text/css", body: "" }))
   await context.route("https://fonts.gstatic.com/**", (route) => route.abort())
   return context
@@ -114,8 +124,12 @@ async function newContext(options = {}) {
 // has the real one: in the worker's runtime cache.
 async function seedPuter(page) {
   await page.evaluate(() => navigator.serviceWorker.ready)
-  await page.evaluate((body) => caches.open("osta-web-runtime").then((c) => c.put("https://js.puter.com/v2/", new Response(body, { headers: { "content-type": "text/javascript" } }))), FAKE_PUTER)
+  const files = { "https://js.puter.com/v2/": FAKE_PUTER }
+  for (const name of ["pdf.min.js", "pdf.worker.min.js"]) files[PDFJS + name] = readFileSync(pdfjsFile(name), "utf8")
+  await page.evaluate((files) => caches.open("osta-web-runtime").then((c) => Promise.all(Object.entries(files).map(([url, body]) => c.put(url, new Response(body, { headers: { "content-type": "text/javascript" } }))))), files)
 }
+const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/"
+const pdfjsFile = (url) => require.resolve("pdfjs-dist/build/" + url.split("/").pop())
 function watchErrors(page) {
   const errors = []
   page.on("pageerror", (e) => errors.push(String(e)))
@@ -179,7 +193,7 @@ await test("signs in, streams the reply, hides LEARN and remembers the lesson", 
   const [call] = await calls(page)
   assert(call.stream === true, "not streaming")
   assert(call.messages[0].role === "system" && call.messages[0].content.includes("Nothing yet"), "system prompt missing")
-  assert(call.model === "claude-sonnet-4-6", "best tier picked " + call.model)
+  assert(call.model === null, "the default should be Puter's cheapest model, got " + call.model)
   await page.screenshot({ path: join(shots, "03-reply-light.png") })
 })
 
@@ -198,6 +212,9 @@ await test("settings: account, credit, and the balanced model", async () => {
   await page.waitForFunction(() => document.getElementById("acct-name").textContent === "tester")
   assert(await page.isVisible("#credit-row"), "credit row hidden")
   assert((await page.textContent("#credit-value")).includes("٦٤"), "credit value wrong")
+  assert((await page.getAttribute("[data-tier=light]", "aria-checked")) === "true", "«الأوفر» is not the default")
+  await page.waitForFunction(() => document.getElementById("model-name").textContent === "النموذج الافتراضي في Puter")
+  await page.click("[data-tier=best]")
   await page.waitForFunction(() => document.getElementById("model-name").textContent.includes("Claude Sonnet 4.6"))
   await page.screenshot({ path: join(shots, "04-settings-light.png") })
   await page.click("[data-tier=balanced]")
@@ -345,6 +362,79 @@ await test("dark theme from settings, kept after reload", async () => {
   await page.screenshot({ path: join(shots, "09-reply-dark.png") })
   assert(errors.length === 0, "page errors: " + errors.join(" | "))
 })
+await test("study: PDF and image in, exam out", async () => {
+  const maker = await browser.newPage()
+  await maker.setContent(`<html dir="rtl"><body style="font:16px sans-serif;padding:40px"><h1>Biology: the cell</h1>
+    <p>The cell is the basic unit of life. Every living thing is made of one or more cells.</p>
+    <p>The nucleus controls the activities of the cell. Mitochondria produce the energy the cell needs.</p>
+    <p>الخلية هي وحدة بناء الكائن الحي، والنواة بتتحكم في أنشطتها.</p></body></html>`)
+  const pdf = join(shots, "material.pdf")
+  await maker.pdf({ path: pdf, format: "A4" })
+  await maker.close()
+  await page.click("#btn-study")
+  await page.waitForSelector("#study.open")
+  await page.waitForTimeout(500)
+  await page.setInputFiles("#study-file", [pdf, join(web, "icons/icon-192.png")])
+  await page.waitForFunction(() => document.querySelectorAll(".file-row").length === 2 && !document.getElementById("study-body").textContent.includes("بيقرا"), null, { timeout: 20000 })
+  assert((await page.textContent(".file-row")).includes("صفحة"), "PDF page count missing")
+  await page.click("[data-seg=count] [data-value='5']")
+  assert((await page.getAttribute("[data-seg=count] [data-value='5']", "aria-checked")) === "true", "count segment not updated")
+  await page.screenshot({ path: join(shots, "15-study-home.png") })
+  await page.click("#study-start")
+  await page.waitForSelector(".choice", { timeout: 15000 })
+  const list = await calls(page)
+  const call = list[list.length - 1]
+  assert(call.messages[0].content.includes("Exactly 5 questions"), "count not in the prompt")
+  const parts = call.messages[1].content
+  assert(Array.isArray(parts) && parts[0].text.includes("basic unit of life"), "PDF text not sent")
+  assert(parts.some((x) => x.type === "image_url"), "image not sent")
+  await page.screenshot({ path: join(shots, "16-question.png") })
+})
+
+await test("study: grades, explains, and keeps the result", async () => {
+  await page.click("[data-answer='1']")
+  await page.waitForSelector(".choice.right")
+  assert(await page.isVisible(".feedback.yes"), "right answer not confirmed")
+  await page.click("[data-next]")
+  await page.click("[data-answer='false']")
+  await page.waitForSelector(".feedback.no")
+  assert((await page.textContent(".feedback h4")).includes("الصح: صح"), "correct answer not shown")
+  await page.click("[data-more]")
+  await page.waitForFunction(() => document.getElementById("study-deep").textContent.includes("مثال"), null, { timeout: 15000 })
+  assert(!(await page.textContent("#study-deep")).includes("LEARN"), "LEARN shown in an explanation")
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: join(shots, "17-explain.png") })
+  await page.click("[data-next]")
+  await page.click("[data-answer='2']")
+  await page.click("[data-next]")
+  await page.waitForSelector(".result")
+  assert((await page.textContent(".result p")).includes("٢ صح من ٣"), "score wrong: " + (await page.textContent(".result p")))
+  await page.waitForTimeout(1100)
+  await page.screenshot({ path: join(shots, "18-result.png") })
+  await page.click("[data-retake-wrong]")
+  await page.waitForSelector(".choice")
+  assert((await page.textContent(".quiz-top")).includes("من ١"), "retake should hold only the wrong question")
+  await page.click("[data-answer='true']")
+  await page.click("[data-next]")
+  await page.waitForSelector(".result")
+  await page.click("#study-back")
+  await page.waitForSelector("[data-exam]")
+  assert((await page.locator("[data-exam]").count()) === 2, "exam history wrong")
+  assert((await page.textContent(".score")).includes("١/١"), "retake score missing")
+  await page.screenshot({ path: join(shots, "19-study-history.png") })
+  const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("osta:study")).exams.length)
+  assert(kept === 2, "exams not saved")
+  await page.click("#study-back")
+  await page.waitForSelector("#study", { state: "hidden" })
+})
+
+await test("study: tolerant quiz parsing", async () => {
+  const r = await page.evaluate(() => {
+    const q = window.osta.parseQuiz('Here:\n```json\n{"title":"T","questions":[{"type":"tf","q":"x","answer":"صح","explain":"e"},{"type":"mcq","q":"y","choices":["a","b"],"answer":5},{"q":"z","choices":["a","b","c"],"answer":"2"}]}\n```', 10)
+    return q.questions.map((x) => x.type + ":" + x.answer)
+  })
+  assert(JSON.stringify(r) === JSON.stringify(["tf:true", "mcq:2"]), JSON.stringify(r))
+})
 await phone.close()
 
 // ---- Desktop ----
@@ -353,7 +443,10 @@ await test("desktop layout, dark system theme", async () => {
   const p = await context.newPage()
   const errs = watchErrors(p)
   await p.goto(base)
+  await p.evaluate(() => localStorage.setItem("osta:settings", JSON.stringify({ theme: "auto", tier: "best" })))
+  await p.reload()
   await p.waitForSelector(".welcome")
+  assert(await p.evaluate(() => JSON.parse(localStorage.getItem("osta:settings")).tier === "light"), "old settings kept the expensive tier")
   assert(await noOverflow(p), "overflow at 1440px")
   await p.screenshot({ path: join(shots, "10-desktop-dark.png") })
   await p.click("#btn-settings")

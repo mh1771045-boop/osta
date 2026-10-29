@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false
       - name: Install Playwright and Chromium
         run: |
-          npm install --global playwright@1.56.1
+          npm install --global playwright@1.56.1 pdfjs-dist@3.11.174
           npx --yes playwright@1.56.1 install --with-deps chromium
       - name: Run the web app tests
         run: NODE_PATH="$(npm root --global)" node script/osta/web-test.mjs "$RUNNER_TEMP/web-test"

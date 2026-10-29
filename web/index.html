@@ -301,7 +301,112 @@ button.row:active, a.row:active, .row button.grow:active { background: var(--fil
 .steps li::before { content: counter(step, arabic-indic); width: 28px; height: 28px; border-radius: 14px; background: var(--fill); display: grid; place-items: center; font-size: 15px; font-weight: 600; flex: none; }
 .steps svg { width: 20px; height: 20px; vertical-align: -4px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+/* Study: a pushed page with its own nav, like an iOS navigation stack */
+:root { --page-cell: #ffffff; --right: #34c759; --wrong: #ff3b30; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page-cell: #1c1c1e; --right: #30d158; --wrong: #ff453a; } }
+:root[data-theme="dark"] { --page-cell: #1c1c1e; --right: #30d158; --wrong: #ff453a; }
+.study-card { margin-top: 14px; }
+.study-card .tile { width: 40px; height: 40px; border-radius: 10px; }
+.study-card .tile svg { width: 22px; height: 22px; }
+.study-card .t, .study-card .s { display: block; }
+.study-card .chev { width: 8px; height: 13px; flex: none; color: var(--label-3); stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transform: scaleX(-1); }
+.study {
+  position: fixed; inset-inline: 0; top: var(--app-top, 0px); height: var(--app-h, 100dvh); z-index: 10;
+  display: flex; flex-direction: column; background: var(--bg-grouped);
+  transform: translateX(-100%); transition: transform 0.45s var(--spring);
+}
+.study.open { transform: none; }
+.study .nav { background: var(--nav); }
+.nav-title { font-size: 17px; line-height: 22px; font-weight: 600; }
+.back { display: inline-flex; align-items: center; gap: 4px; color: var(--accent); font-size: 17px; padding: 10px 8px; min-height: 44px; }
+.back svg { width: 12px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.study-scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+.study-body {
+  max-width: 760px; margin: 0 auto; padding-block: 8px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.large-title { margin: 6px 4px 4px; font-size: 34px; line-height: 41px; font-weight: 700; }
+.lead { margin: 0 4px 18px; color: var(--label-2); font-size: 15px; line-height: 20px; }
+.study .group { background: var(--page-cell); }
+.study .section-h { margin-inline: 16px; }
+.dropzone {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 16px;
+  border-radius: 12px; border: 1.5px dashed var(--separator); background: var(--page-cell); color: var(--accent); text-align: center;
+}
+.dropzone.over { border-color: var(--accent); background: var(--fill); }
+.dropzone svg { width: 34px; height: 34px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.dropzone b { font-size: 17px; font-weight: 600; }
+.dropzone span { font-size: 13px; color: var(--label-2); }
+.file-row .tile { width: 32px; height: 32px; border-radius: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.file-row .tile.pdf { background: var(--danger); } .file-row .tile.img { background: var(--accent); }
+.paste { width: 100%; min-height: 96px; max-height: 240px; padding: 12px 16px; border: 0; border-radius: 12px; background: var(--page-cell); font: inherit; font-size: 16px; line-height: 22px; color: var(--label); resize: vertical; display: block; }
+.study .segmented { margin: 10px 12px; }
+.seg-label { font-size: 15px; color: var(--label-2); padding: 10px 16px 0; }
+.study .primary { max-width: none; margin-top: 18px; }
+.secondary { width: 100%; min-height: 50px; border-radius: 12px; background: var(--page-cell); color: var(--accent); font-size: 17px; font-weight: 600; margin-top: 10px; }
+.secondary:active { background: var(--fill); }
+.secondary:disabled, .primary:disabled { opacity: 0.45; }
+.study .card-md { background: var(--page-cell); border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
+.score { font-size: 15px; font-weight: 600; color: var(--label-2); flex: none; font-variant-numeric: tabular-nums; }
+.score.good { color: var(--right); } .score.bad { color: var(--wrong); }
+.loading { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 18vh 16px 0; }
+.loading h2 { margin: 6px 0 0; font-size: 22px; line-height: 28px; }
+.loading p { margin: 0; color: var(--label-2); font-size: 15px; }
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--fill-strong); border-top-color: var(--accent); animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading .secondary { max-width: 220px; }
+.quiz-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--label-2); margin: 10px 4px 6px; font-variant-numeric: tabular-nums; }
+.bar { height: 4px; border-radius: 2px; background: var(--fill-strong); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s var(--spring); }
+.qtype { display: inline-block; margin: 18px 4px 6px; font-size: 13px; font-weight: 600; color: var(--accent); }
+.question { margin: 0 4px 16px; font-size: 21px; line-height: 29px; font-weight: 600; }
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.choices.tf { flex-direction: row; }
+.choices.tf .choice { flex: 1; justify-content: center; font-weight: 600; }
+.choice {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 12px 14px; border-radius: 14px;
+  background: var(--page-cell); border: 1.5px solid transparent; text-align: start; font-size: 17px; line-height: 22px;
+  transition: transform 0.15s, background-color 0.2s, border-color 0.2s;
+}
+.choice:not(:disabled):active { transform: scale(0.98); }
+.choice b { width: 30px; height: 30px; border-radius: 15px; flex: none; display: grid; place-items: center; background: var(--fill); font-size: 15px; }
+.choice:disabled { cursor: default; }
+.choice.right { border-color: var(--right); background: color-mix(in srgb, var(--right) 14%, var(--page-cell)); }
+.choice.right b { background: var(--right); color: #fff; }
+.choice.wrong { border-color: var(--wrong); background: color-mix(in srgb, var(--wrong) 12%, var(--page-cell)); }
+.choice.wrong b { background: var(--wrong); color: #fff; }
+.choice.dim { opacity: 0.55; }
+.feedback { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--page-cell); border-inline-start: 4px solid var(--right); animation: rise 0.35s var(--spring) both; }
+.feedback.no { border-inline-start-color: var(--wrong); }
+.feedback h4 { margin: 0 0 4px; font-size: 17px; line-height: 22px; }
+.feedback.yes h4 { color: var(--right); } .feedback.no h4 { color: var(--wrong); }
+.feedback p { margin: 0; font-size: 16px; line-height: 23px; }
+.feedback .more { margin-top: 10px; color: var(--accent); font-size: 15px; font-weight: 600; }
+.feedback .deep { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--separator); font-size: 16px; }
+.result { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 18px; }
+.ring { width: 150px; height: 150px; position: relative; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 12; }
+.ring .track { stroke: var(--fill-strong); }
+.ring .fill { stroke: var(--right); stroke-linecap: round; transition: stroke-dashoffset 1s var(--spring); }
+.ring.mid .fill { stroke: var(--orange); } .ring.low .fill { stroke: var(--wrong); }
+.ring span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.result h2 { margin: 14px 0 2px; font-size: 22px; line-height: 28px; }
+.result p { margin: 0; color: var(--label-2); font-size: 15px; }
+.review { margin-top: 22px; }
+.review details { border-top: 0.5px solid var(--separator); }
+.review details:first-child { border-top: 0; }
+.review summary { list-style: none; display: flex; gap: 10px; align-items: flex-start; padding: 12px 16px; cursor: pointer; font-size: 16px; line-height: 22px; }
+.review summary::-webkit-details-marker { display: none; }
+.review summary i { font-style: normal; font-weight: 700; flex: none; width: 20px; }
+.review .ok i { color: var(--right); } .review .ko i { color: var(--wrong); }
+.review .ans { padding: 0 16px 12px 46px; padding-inline: 46px 16px; font-size: 15px; line-height: 21px; color: var(--label-2); }
+.review .ans b { color: var(--label); }
+
 @media (prefers-reduced-motion: reduce) {
+  .study, .ring .fill, .bar i { transition: none; }
+  .feedback { animation: none; }
+  .spinner { animation-duration: 3s; }
   .sheet, .scrim, .app, .toast { transition: none; }
   .msg.enter, .learned { animation: none; }
   .thinking i { animation: none; opacity: 0.8; }
@@ -324,6 +429,9 @@ button.row:active, a.row:active, .row button.grow:active { background: var(--fil
       <span class="status" id="status" aria-live="polite">مساعد البرمجة</span>
     </div>
     <div class="side end">
+      <button class="icon-btn" id="btn-study" aria-label="المذاكرة والامتحانات">
+        <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>
+      </button>
       <button class="icon-btn" id="btn-memory" aria-label="ذاكرة أسطى">
         <svg viewBox="0 0 24 24"><path d="M12 3.5a5.5 5.5 0 0 0-3.2 10c.6.5 1 1.1 1 1.9v.6h4.4v-.6c0-.8.4-1.4 1-1.9a5.5 5.5 0 0 0-3.2-10z"/><path d="M10 19h4M10.8 21.5h2.4"/></svg>
       </button>
@@ -360,6 +468,16 @@ button.row:active, a.row:active, .row button.grow:active { background: var(--fil
     <p class="hint">مجاني ومن غير مفتاح API، عن طريق Puter. أسطى ممكن يغلط، فراجع الكود قبل ما تستخدمه.</p>
   </footer>
 </div>
+
+<section class="study" id="study" aria-labelledby="study-title" hidden>
+  <nav class="nav" id="study-nav">
+    <div class="side"><button class="back" id="study-back"><svg viewBox="0 0 12 20" aria-hidden="true"><path d="M2 2l8 8-8 8"/></svg><span id="study-back-label">رجوع</span></button></div>
+    <div class="brand"><span class="nav-title" id="study-title">المذاكرة</span></div>
+    <div class="side end"></div>
+  </nav>
+  <div class="study-scroll" id="study-scroll"><div class="study-body" id="study-body"></div></div>
+  <input type="file" id="study-file" accept="application/pdf,.pdf,image/*" multiple hidden>
+</section>
 
 <div class="toast" id="toast" role="status" hidden><span id="toast-text"></span><button id="toast-btn" hidden></button></div>
 
@@ -485,5 +603,6 @@ button.row:active, a.row:active, .row button.grow:active { background: var(--fil
 </section>
 
 <script src="app.js" defer></script>
+<script src="study.js" defer></script>
 </body>
 </html>

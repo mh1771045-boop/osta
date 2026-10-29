@@ -24,6 +24,12 @@
       "short_name": "جديدة",
       "url": "./?new=1",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "ذاكر وامتحن نفسك",
+      "short_name": "ذاكر",
+      "url": "./?study=1",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
