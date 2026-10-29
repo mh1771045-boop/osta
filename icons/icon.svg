@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3a3c"/>
+      <stop offset="1" stop-color="#0c0c0d"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
+  <g transform="translate(67.9 196.6) scale(3.3)">
+    <path d="M6 18L18 18L18 30L6 30Z" fill="#ffffff" fill-opacity="0.2"/><path d="M0 6L24 6L24 36L0 36ZM6 12L6 30L18 30L18 12Z" fill="#a1a1a6"/>
+    <path d="M36 12L54 12L54 18L36 18ZM30 24L48 24L48 30L30 30Z" fill="#ffffff" fill-opacity="0.2"/><path d="M30 6L54 6L54 12L36 12L36 18L54 18L54 36L30 36L30 30L48 30L48 24L30 24Z" fill="#a1a1a6"/>
+    <path d="M66 18L84 18L84 30L66 30Z" fill="#ffffff" fill-opacity="0.2"/><path d="M60 0L66 0L66 6L84 6L84 12L66 12L66 30L84 30L84 36L60 36Z" fill="#ffffff"/>
+    <path d="M90 12L108 12L108 18L90 18ZM96 24L108 24L108 30L96 30Z" fill="#ffffff" fill-opacity="0.2"/><path d="M90 6L114 6L114 36L90 36L90 18L108 18L108 12L90 12ZM96 24L96 30L108 30L108 24Z" fill="#ffffff"/>
+  </g>
+</svg>
