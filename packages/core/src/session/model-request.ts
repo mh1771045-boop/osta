@@ -100,9 +100,11 @@ export const baseTranscript = (input: {
   return {
     providerMetadataKey,
     system: [
-      input.agent.system
-        ? input.agent.system
-        : SessionSystemPrompt.make(input.tools.definitions.map((tool) => tool.name)),
+      // A custom prompt can build on Osta's own, so it gets the same tool guidance and method.
+      SessionSystemPrompt.render(
+        input.agent.system || SessionSystemPrompt.PROMPT,
+        input.tools.definitions.map((tool) => tool.name),
+      ),
       input.initial,
     ]
       .filter((part) => part.length > 0)

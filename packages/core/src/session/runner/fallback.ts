@@ -9,7 +9,10 @@ import { Model } from "../../model.js"
  * Only a model inside the chain falls back, so a model the user brought a key for keeps the usual retries.
  */
 const CHAIN: ReadonlyArray<(model: Pick<Model.Info, "providerID" | "id" | "cost">) => boolean> = [
-  (model) => model.providerID === "kilo" && model.id === Model.KILO_ULTRA,
+  // Any other Kilo free model, such as a team member's, sits with Ultra so it falls back to Lightning next.
+  (model) =>
+    model.providerID === "kilo" &&
+    (model.id === Model.KILO_ULTRA || (model.id.endsWith(":free") && model.id !== Model.KILO_LIGHTNING)),
   (model) => model.providerID === "kilo" && model.id === Model.KILO_LIGHTNING,
   (model) => model.providerID === "opencode" && !model.cost.some((cost) => cost.input > 0),
   (model) => model.providerID === "github-copilot",
@@ -17,8 +20,7 @@ const CHAIN: ReadonlyArray<(model: Pick<Model.Info, "providerID" | "id" | "cost"
 ]
 
 /** A source is out of requests: rate limited (429) or past its free or paid quota. */
-export const exhausted = (cause: AIError) =>
-  cause.reason._tag === "RateLimit" || cause.reason._tag === "QuotaExceeded"
+export const exhausted = (cause: AIError) => cause.reason._tag === "RateLimit" || cause.reason._tag === "QuotaExceeded"
 
 /** The first available model in a later source than `current`, cheapest first within a source. */
 export function next(current: Model.Ref, available: ReadonlyArray<Model.Info>) {
