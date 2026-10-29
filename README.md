@@ -38,16 +38,35 @@ Osta starts with free models and never asks for a key on first run.
 
 - **Built-in free models.** They come from the free tier of OpenCode Zen, the model service run by the opencode team. The models on offer, their limits and their data policy are set by that service and can change.
 - **GitHub Copilot Free.** Run `osta auth login`, pick GitHub Copilot, and sign in with your GitHub account in the browser.
-- **Local models.** Run models on your own machine with Ollama or LM Studio and add them as a provider. Osta uses the same provider config as opencode ([OpenCode V2 docs](https://opencode.ai/v2/docs/)).
+- **Local models.** Run models on your own machine with [Ollama](https://ollama.com) or LM Studio and add them as a provider (example below).
 
 Paid providers such as Anthropic, OpenAI and Google work too, but you never need them.
+
+#### A model on your own computer
+
+Install Ollama, pull a coding model (`ollama pull qwen2.5-coder:7b`), then add this to `~/.config/osta/osta.json`:
+
+```jsonc
+{
+  "providers": {
+    "ollama": {
+      "name": "Ollama",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": { "baseURL": "http://localhost:11434/v1" },
+      "models": { "qwen2.5-coder:7b": { "name": "Qwen 2.5 Coder 7B" } }
+    }
+  }
+}
+```
+
+Pick it with `/models` in Osta, or run `osta run -m ollama/qwen2.5-coder:7b "..."`. Osta uses opencode's provider format, so the [OpenCode V2 provider docs](https://opencode.ai/v2/docs/providers) apply.
 
 ### What Osta adds to opencode
 
 | | |
 |---|---|
 | **A craftsman's way of working** | Every model gets the same loop: understand, decide, act, verify, report, learn. Osta proves a change works (tests, types, build) before saying it does, and says plainly what it could not check. |
-| **Learning memory** | After meaningful work Osta writes short lessons to `.osta/learnings.md` in the project, or to `~/.config/osta/learnings.md` when a lesson applies everywhere. Both load at the start of every session, newest lessons first when space runs out. They are plain Markdown you can read, edit or delete. Set `OSTA_DISABLE_LEARNINGS=1` to turn it off. |
+| **Learning memory** | After meaningful work Osta writes short lessons to `.osta/learnings.md` in the project, or to `~/.config/osta/learnings.md` when a lesson applies everywhere. Both load at the start of every session, newest lessons first when space runs out. They are plain Markdown you can read, edit or delete. `/learn <lesson>` records one by hand, `/learnings` lists and tidies them, and `OSTA_DISABLE_LEARNINGS=1` turns the memory off. |
 | **Arabic and English** | Osta replies in the language you write in, including natural Egyptian Arabic, while code, comments and commits stay in English. |
 | **Its own home, compatible with opencode** | Settings live in `~/.config/osta`, `osta.json` and `.osta/`. Your existing `opencode.json`, `.opencode/` and `AGENTS.md` files keep working. `OSTA_*` environment variables work wherever opencode reads `OPENCODE_*`. |
 
@@ -73,7 +92,7 @@ cd packages/cli && bun run script/build.ts --single   # build a binary for this 
 
 ### Known limitations
 
-- Some parts of the web and desktop apps still show opencode artwork, such as the animated wordmark on the new-session screen. The terminal app, CLI and sign-in pages are fully Osta.
+- The desktop app is not packaged for Osta yet. Use the terminal app, or the web app through `osta serve` / `osta pair`.
 - Osta is not published to npm, Homebrew or WinGet yet. Install it with the script above or from Releases.
 
 ### Credits and license

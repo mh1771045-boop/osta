@@ -1,0 +1,14 @@
+Show and tidy Osta's learning memory.
+
+Input: $ARGUMENTS
+
+The memory lives in two Markdown files:
+- Project lessons: `${path}/.osta/learnings.md`
+- Lessons for every project: `~/.config/osta/learnings.md`
+
+1. Read both files. If neither exists, say that Osta has no lessons yet and that `/learn` records one, then stop.
+2. Show the lessons grouped by file, numbered, newest last.
+3. Point out duplicates, lessons that contradict each other, and lessons that look outdated for this project, and propose how to merge, fix, or remove them.
+4. If the input asks for a change (for example "remove 3", "merge 2 and 5", "move 4 to global", or "clear project"), make exactly that change. Otherwise change nothing and ask which of your proposals to apply.
+
+Never delete lessons without the user asking for it in this command or confirming your proposal. Keep the `- YYYY-MM-DD: <lesson>` format and the `# Osta learnings` heading.

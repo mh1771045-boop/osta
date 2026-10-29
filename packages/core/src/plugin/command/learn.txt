@@ -1,0 +1,20 @@
+Record lessons in Osta's learning memory.
+
+Input: $ARGUMENTS
+
+The memory lives in two Markdown files, loaded at the start of every session:
+- Project lessons: `${path}/.osta/learnings.md`
+- Lessons for every project: `~/.config/osta/learnings.md`
+
+What to record:
+1. If the input states a lesson, record that lesson. Keep the user's meaning; tighten the wording.
+2. If the input is empty, look back over this session and pick one to three lessons worth keeping: a preference the user stated, a pitfall you hit and how you fixed it, or a command or convention that works in this project. Skip anything obvious, temporary, or already in the files.
+3. Put a lesson in the global file only when it clearly applies beyond this project (for example a personal preference, or the input says "global" or "everywhere"). Otherwise use the project file.
+
+How to write it:
+- Read the target file first, if it exists. Don't add a lesson that is already there; update the existing bullet instead when the new one refines it.
+- Append one bullet per lesson, newest last, in this form: `- YYYY-MM-DD: <lesson>`, using today's date.
+- Create the file and its directory when they don't exist, starting the file with the heading `# Osta learnings`.
+- Never record secrets, tokens, passwords, or personal data the user didn't ask you to keep.
+
+Finish with a short reply that quotes the lessons you recorded and the file each went to.

@@ -18,6 +18,8 @@ import { testEffect } from "../lib/effect"
 import { host } from "./host"
 import PROMPT_INITIALIZE from "../../src/plugin/command/initialize.txt"
 import PROMPT_REVIEW from "../../src/plugin/command/review.txt"
+import PROMPT_LEARN from "../../src/plugin/command/learn.txt"
+import PROMPT_LEARNINGS from "../../src/plugin/command/learnings.txt"
 
 const directory = AbsolutePath.make("/repo/packages/app")
 const project = AbsolutePath.make("/repo")
@@ -33,6 +35,62 @@ const it = testEffect(
 )
 
 describe("CommandPlugin.Plugin", () => {
+  it.effect("registers Osta's learn and learnings commands", () =>
+    Effect.gen(function* () {
+      const command = yield* Command.Service
+      const prompts: string[] = []
+      yield* CommandPlugin.Plugin.effect(
+        host({
+          command: {
+            list: () => Effect.die("unused command.list"),
+            transform: command.transform,
+            reload: command.reload,
+          },
+          session: {
+            prompt: (input) =>
+              Effect.sync(() => {
+                prompts.push(input.text)
+                return SessionInbox.User.make({
+                  id: SessionMessage.ID.make("msg_test"),
+                  sessionID: input.sessionID,
+                  time: { created: DateTime.makeUnsafe(0) },
+                  type: "user",
+                  payload: { text: input.text },
+                  delivery: input.delivery ?? "steer",
+                })
+              }),
+          },
+        }),
+      ).pipe(
+        Effect.provideService(
+          Location.Service,
+          Location.Service.of(location({ directory }, { projectDirectory: project })),
+        ),
+      )
+
+      expect(yield* command.get("learn")).toMatchObject({ name: "learn" })
+      expect(yield* command.get("learnings")).toMatchObject({ name: "learnings" })
+      for (const name of ["learn", "learnings"])
+        yield* command.execute({
+          name,
+          invocation: {
+            sessionID: Session.ID.make("ses_test"),
+            prompt: { text: "  run bun test from the package directory " },
+            delivery: "steer",
+          },
+        })
+      expect(prompts).toEqual([
+        PROMPT_LEARN.replaceAll("${path}", project).replaceAll("$ARGUMENTS", "run bun test from the package directory"),
+        PROMPT_LEARNINGS.replaceAll("${path}", project).replaceAll(
+          "$ARGUMENTS",
+          "run bun test from the package directory",
+        ),
+      ])
+      expect(prompts[0]).toContain(`${project}/.osta/learnings.md`)
+      expect(prompts[0]).not.toContain("${path}")
+    }),
+  )
+
   it.effect("registers built-in init and review commands", () =>
     Effect.gen(function* () {
       const command = yield* Command.Service

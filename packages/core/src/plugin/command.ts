@@ -7,6 +7,8 @@ import { Location } from "../location.js"
 import { Mcp } from "../mcp/index.js"
 import PROMPT_INITIALIZE from "./command/initialize.txt"
 import PROMPT_REVIEW from "./command/review.txt"
+import PROMPT_LEARN from "./command/learn.txt"
+import PROMPT_LEARNINGS from "./command/learnings.txt"
 
 export const Plugin = define({
   id: "opencode.command",
@@ -52,6 +54,25 @@ export const Plugin = define({
             })
             .pipe(Effect.asVoid),
       })
+      // Osta's learning memory: record lessons by hand, and review or prune them.
+      for (const [name, description, template] of [
+        ["learn", "record a lesson in Osta's learning memory", PROMPT_LEARN],
+        ["learnings", "show and tidy Osta's learning memory", PROMPT_LEARNINGS],
+      ] as const) {
+        editor.add({
+          name,
+          description,
+          execute: (input) =>
+            ctx.session
+              .prompt({
+                ...input.prompt,
+                sessionID: input.sessionID,
+                text: append(template.replaceAll("${path}", location.project.directory), input.prompt.text),
+                delivery: input.delivery,
+              })
+              .pipe(Effect.asVoid),
+        })
+      }
       for (const prompt of loaded.prompts) {
         editor.add({
           name: mcpCommandName(prompt.server, prompt.name),
