@@ -30,7 +30,10 @@ jobs:
         run: echo "OPENCODE_VERSION=${VERSION#v}" >> "$GITHUB_ENV"
       - name: Build every platform
         working-directory: packages/cli
-        run: bun run script/build.ts && rm -rf dist/.bun
+        # The release notes' Highlights become the "What's new" dialog after an upgrade.
+        run: |
+          export OPENCODE_RELEASE_NOTES="$(cat "$GITHUB_WORKSPACE/RELEASE_NOTES.md")"
+          bun run script/build.ts && rm -rf dist/.bun
         env:
           OPENCODE_CHANNEL: latest
           BUN_COMPILE_RELEASE: bun-v1.4.4
