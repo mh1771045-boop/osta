@@ -1,0 +1,36 @@
+name: probe-ai
+on:
+  push:
+    branches: [probe-ai]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: OpenCode Zen preflight (browser CORS)
+        run: |
+          curl -s -i -X OPTIONS https://opencode.ai/inference/openai/v1/chat/completions \
+            -H "Origin: https://mh1771045-boop.github.io" \
+            -H "Access-Control-Request-Method: POST" \
+            -H "Access-Control-Request-Headers: authorization,content-type" | head -30
+      - name: OpenCode Zen free model call
+        run: |
+          curl -s -i https://opencode.ai/inference/openai/v1/chat/completions \
+            -H "Origin: https://mh1771045-boop.github.io" \
+            -H "Authorization: Bearer public" -H "Content-Type: application/json" \
+            -d '{"model":"big-pickle","messages":[{"role":"user","content":"Reply with one short Arabic greeting."}],"max_tokens":60}' | head -c 1800; echo
+      - name: OpenCode Zen streaming call
+        run: |
+          curl -s -N https://opencode.ai/inference/openai/v1/chat/completions \
+            -H "Origin: https://mh1771045-boop.github.io" \
+            -H "Authorization: Bearer public" -H "Content-Type: application/json" \
+            -d '{"model":"big-pickle","stream":true,"messages":[{"role":"user","content":"Say hi"}],"max_tokens":30}' | head -c 1200; echo
+      - name: OpenCode Zen models list
+        run: |
+          curl -s -i https://opencode.ai/inference/openai/v1/models -H "Origin: https://mh1771045-boop.github.io" -H "Authorization: Bearer public" | head -c 2500; echo
+      - name: Pollinations
+        run: |
+          curl -s -i -X OPTIONS https://text.pollinations.ai/openai -H "Origin: https://mh1771045-boop.github.io" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type" | head -20
+          curl -s -i https://text.pollinations.ai/openai -H "Origin: https://mh1771045-boop.github.io" -H "Content-Type: application/json" \
+            -d '{"model":"openai","messages":[{"role":"user","content":"Say hi"}]}' | head -c 1200; echo
