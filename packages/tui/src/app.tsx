@@ -48,6 +48,7 @@ import {
 } from "./context/runtime"
 import { DialogProvider, useDialog } from "./ui/dialog"
 import { DialogIntegration } from "./component/dialog-integration"
+import { DialogConfirm } from "./ui/dialog-confirm"
 import { ErrorComponent } from "./component/error-component"
 import { PluginRouteMissing } from "./component/plugin-route-missing"
 import { EditorContextProvider } from "./context/editor"
@@ -744,6 +745,44 @@ function App() {
       .then((show) => {
         if (show && dialog.stack.length === 0)
           dialog.replace(() => <DialogHighlights version={app.version} items={items} />)
+      })
+      .catch(toast.error)
+  })
+
+  // Osta's free models need no sign-in. GitHub Copilot's free plan is one more source to switch to when their limits
+  // run out, so the first launch offers it once; `/connect` stays the way back.
+  const [onboarding, updateOnboarding] = storage.store<{ copilot?: boolean }>("onboarding", { initial: {} })
+  let copilotOffered = false
+  createEffect(() => {
+    if (copilotOffered || onboarding.copilot || !plugins.ready() || client.connection.status() !== "connected") return
+    if (route.data.type !== "home" || dialog.stack.length > 0 || promptRef.current?.current.text) return
+    if (args.prompt || args.continue || args.sessionID || args.newSessionID) return
+    if (process.env.OPENCODE_DRIVE || process.env.OPENCODE_STORY || process.env.OPENCODE_ROUTE) return
+    const copilot = data.location.integration
+      .list(location.ref ?? data.location.default())
+      ?.find((item) => item.id === "github-copilot")
+    if (!copilot) return
+    copilotOffered = true
+    const claimed = { offer: false }
+    void updateOnboarding((draft) => {
+      claimed.offer = !draft.copilot && copilot.connections.length === 0
+      draft.copilot = true
+    })
+      .then(() => {
+        if (!claimed.offer || dialog.stack.length > 0) return
+        dialog.replace(() => (
+          <DialogConfirm
+            title="GitHub Copilot"
+            message="Osta already works for free, with no key. Sign in to GitHub Copilot's free plan too, and Osta has one more model to switch to when a free limit runs out."
+            label={{ confirm: "sign in", cancel: "later" }}
+            // The confirm dialog clears the stack after this callback, so the sign-in opens once it has.
+            onConfirm={() =>
+              queueMicrotask(() =>
+                dialog.replace(() => <DialogIntegration integrationID="github-copilot" autoConnect />),
+              )
+            }
+          />
+        ))
       })
       .catch(toast.error)
   })

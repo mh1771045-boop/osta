@@ -46,8 +46,11 @@ Prebuilt downloads for every platform are on the [Releases page](https://github.
 
 Osta starts with free models and never asks for a key on first run.
 
-- **Built-in free models.** They come from the free tier of OpenCode Zen, the model service run by the opencode team. The models on offer, their limits and their data policy are set by that service and can change.
-- **GitHub Copilot Free.** Run `osta auth login`, pick GitHub Copilot, and sign in with your GitHub account in the browser.
+- **Kilo's free Nemotron models (the default).** Osta starts on NVIDIA Nemotron 3 Ultra through the [Kilo gateway](https://kilo.ai), with Nemotron 3.5 Lightning as its fast second. Kilo serves its `:free` models without an account, limited per IP address (about 200 requests an hour today).
+- **OpenCode Zen's free models.** They come from the free tier of OpenCode Zen, the model service run by the opencode team.
+- **GitHub Copilot Free.** Osta offers the sign-in on first launch. Later, run `/connect` (or `osta auth login`), pick GitHub Copilot, and sign in with your GitHub account in the browser.
+
+When one source runs out (a 429 or a used-up free limit), Osta quietly moves the same task to the next one and keeps going: Kilo Ultra, then Kilo Lightning, then Zen, then Copilot, then a local Ollama if you run one. Osta's personality and way of working come from its own prompt, so they stay the same on every model. The models on offer, their limits and their data policies are set by each service and can change.
 - **Local models.** Run models on your own machine with [Ollama](https://ollama.com) or LM Studio and add them as a provider (example below).
 
 Paid providers such as Anthropic, OpenAI and Google work too, but you never need them.

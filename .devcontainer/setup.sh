@@ -17,8 +17,10 @@ sudo chown "$(id -u):$(id -g)" /workspaces/projects
 osta service set port 4096 >/dev/null
 
 # Codespaces sets GITHUB_TOKEN, which would make GitHub Copilot the default model even for accounts without Copilot.
-# Start on a free model instead; Copilot stays one `osta auth login` away.
-free=$(osta models --standalone 2>/dev/null | grep -x 'opencode/big-pickle' || osta models --standalone 2>/dev/null | grep -m 1 '^opencode/' || true)
+# Start on Osta's free default instead; Copilot stays one `osta auth login` away.
+models=$(osta models --standalone 2>/dev/null || true)
+pick() { printf '%s\n' "$models" | grep -m 1 "$@"; }
+free=$(pick -x 'kilo/nvidia/nemotron-3-ultra-550b-a55b:free' || pick -x 'opencode/big-pickle' || pick '^opencode/' || true)
 if [ -n "$free" ] && [ ! -e "$HOME/.config/osta/osta.json" ]; then
   mkdir -p "$HOME/.config/osta"
   printf '{\n  "agents": {\n    "build": { "model": "%s" },\n    "plan": { "model": "%s" }\n  }\n}\n' "$free" "$free" \

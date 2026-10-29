@@ -117,9 +117,9 @@ const testLLM = Layer.unwrap(
 type ModelLimit = { readonly context: number; readonly input?: number; readonly output: number }
 const defaultModelLimit = { context: 200_000, output: 32_000 }
 const modelLimits = new Map<string, ModelLimit>()
-const testModel = (id: string, limit: ModelLimit = defaultModelLimit) => {
+const testModel = (id: string, limit: ModelLimit = defaultModelLimit, provider = "fake") => {
   modelLimits.set(id, limit)
-  return LanguageModel.make({ id, provider: "fake", route: OpenAIChat.route })
+  return LanguageModel.make({ id, provider, route: OpenAIChat.route })
 }
 const model = testModel("fake-model")
 const defaultSystem = SessionSystemPrompt.make([])
@@ -217,6 +217,7 @@ const makeRunnerState = (compaction?: SessionRunnerModel.Resolved["compaction"])
     }).pipe(Effect.andThen(Deferred.succeed(barrier.release, undefined)), Effect.asVoid)
   return {
     currentModel: model,
+    availableModels: new Array<Model.Info>(),
     compaction,
     modelResolveHook: resolvesModel,
     systemBaseline: "Initial context",
@@ -332,7 +333,17 @@ const layer = Layer.unwrap(
       resolve: (session) =>
         state.modelResolveHook.pipe(
           Effect.map(() => {
-            const selected = session.model?.id === "replacement" ? replacementModel : state.currentModel
+            const listed =
+              session.model &&
+              state.availableModels.some(
+                (item) => item.providerID === session.model?.providerID && item.id === session.model.id,
+              )
+            const selected =
+              session.model?.id === "replacement"
+                ? replacementModel
+                : listed && session.model
+                  ? testModel(session.model.id, defaultModelLimit, session.model.providerID)
+                  : state.currentModel
             return SessionRunnerModel.resolved(selected, {
               capabilities: { tools: true, input: ["text", "image"], output: ["text"] },
               cost: [],
@@ -415,7 +426,7 @@ const layer = Layer.unwrap(
     const promptModels = Layer.mock(Model.Service, {
       get: () => Effect.undefined,
       all: () => Effect.succeed([]),
-      available: () => Effect.succeed([]),
+      available: () => Effect.sync(() => state.availableModels),
       default: () => Effect.undefined,
       small: () => Effect.undefined,
     })
@@ -5669,6 +5680,45 @@ describe("SessionRunnerLLM", () => {
     yield* TestClock.adjust("4999 millis")
     expect(s.requests).toHaveLength(1)
     yield* TestClock.adjust("1 millis")
+    yield* Fiber.join(run)
+    expect(s.requests).toHaveLength(2)
+  })
+
+  scenario("moves a rate-limited free model to the next free source without announcing a retry", function* (s) {
+    const ultra = Model.Info.default(Provider.ID.make("kilo"), Model.KILO_ULTRA)
+    const lightning = Model.Info.default(Provider.ID.make("kilo"), Model.KILO_LIGHTNING)
+    s.availableModels = [ultra, lightning]
+    s.currentModel = testModel(Model.KILO_ULTRA, defaultModelLimit, "kilo")
+    yield* s.admit("Keep going when Kilo runs out")
+    yield* s.llm.push(Stream.fail(rateLimited(3_600_000)))
+    yield* s.llm.push(TestLLM.text("Recovered on Lightning", "fallback-success"))
+
+    const scheduled = yield* subscribeRetries(s)
+    yield* s.resume
+    expect(s.requests.map((request) => `${request.model.provider}/${request.model.id}`)).toEqual([
+      `kilo/${Model.KILO_ULTRA}`,
+      `kilo/${Model.KILO_LIGHTNING}`,
+    ])
+    expect(yield* Queue.size(scheduled)).toBe(0)
+    expect((yield* s.session.get(sessionID)).model).toMatchObject({ providerID: "kilo", id: Model.KILO_LIGHTNING })
+    expect(yield* s.context).toMatchObject([
+      { type: "user" },
+      { type: "model-switched" },
+      Expected.assistant({ finish: "stop" }, [Expected.text("Recovered on Lightning")]),
+    ])
+  })
+
+  scenario("keeps the usual retries when the last free source is rate limited", function* (s) {
+    s.availableModels = [Model.Info.default(Provider.ID.make("kilo"), Model.KILO_LIGHTNING)]
+    s.currentModel = testModel(Model.KILO_LIGHTNING, defaultModelLimit, "kilo")
+    yield* s.admit("Nothing left to switch to")
+    yield* s.llm.push(Stream.fail(rateLimited(5_000)))
+    yield* s.llm.push(TestLLM.text("Recovered", "fallback-retry"))
+
+    const scheduled = yield* subscribeRetries(s)
+    const run = yield* s.resume.pipe(Effect.forkChild)
+    yield* Queue.take(scheduled)
+    yield* TestClock.adjust("5 seconds")
     yield* Fiber.join(run)
     expect(s.requests).toHaveLength(2)
   })

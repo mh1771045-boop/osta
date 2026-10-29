@@ -25,10 +25,12 @@ import { Snapshot } from "../../snapshot.js"
 import { makeLocationNode } from "@opencode/util/effect/app-node"
 import { llmClient } from "../../effect/app-node-platform.js"
 import { StepFailedError } from "../error.js"
+import { SessionRunnerFallback } from "./fallback.js"
 import { SessionRunnerRetry } from "./retry.js"
 import { SessionStep } from "./step.js"
 import { ToolOutput } from "../../tool-output.js"
 import { Plugin } from "../../plugin.js"
+import { Model } from "../../model.js"
 import { MAX_STEPS_PROMPT } from "./max-steps.js"
 
 const CONTINUE_AFTER_INCOMPLETE_STREAM =
@@ -49,6 +51,7 @@ const layer = Layer.effect(
     const compaction = yield* SessionCompaction.Service
     const plugins = yield* Plugin.Service
     const title = yield* SessionTitle.Service
+    const catalog = yield* Model.Service
     const steps = yield* SessionStep.make
     // Title generation starts once input is visible and must not delay model execution.
     const titles = yield* FiberMap.make<SessionSchema.ID, void, never>()
@@ -268,13 +271,32 @@ const layer = Layer.effect(
             executeTool: (call) => plugins.awaitActivation.pipe(Effect.andThen(prepared.executeTool(call))),
           },
           retry: (cause, error, proposed) =>
-            retry.decide({
-              cause,
-              error,
-              agent: loaded.agent.id,
-              model: loaded.model.ref,
-              hook: prepared.retry,
-              retry: proposed,
+            Effect.gen(function* () {
+              // A free source that ran out hands the same Step to the next one instead of waiting for its reset.
+              const next = SessionRunnerFallback.exhausted(cause)
+                ? SessionRunnerFallback.next(loaded.model.ref, yield* catalog.available())
+                : undefined
+              if (next) {
+                yield* Effect.logInfo("free source exhausted; switching model", {
+                  sessionID,
+                  from: loaded.model.ref,
+                  to: { providerID: next.providerID, id: next.id },
+                })
+                yield* bus.publish(SessionEvent.ModelSelected, {
+                  sessionID,
+                  model: Model.Ref.make({ providerID: next.providerID, id: next.id }),
+                  previous: loaded.session.model,
+                })
+                return { retry: true as const, attempt: 1, delay: 0, silent: true }
+              }
+              return yield* retry.decide({
+                cause,
+                error,
+                agent: loaded.agent.id,
+                model: loaded.model.ref,
+                hook: prepared.retry,
+                retry: proposed,
+              })
             }),
           recoverContinuation,
           recoverOverflow: Effect.suspend(() =>
@@ -295,17 +317,20 @@ const layer = Layer.effect(
             return outcome.needsContinuation
           }),
           Retry: (outcome) =>
-            retry.wait({
-              decision: outcome.decision,
-              error: outcome.error,
-              assistantMessageID,
-            }),
+            outcome.decision.silent
+              ? Effect.void
+              : retry.wait({
+                  decision: outcome.decision,
+                  error: outcome.error,
+                  assistantMessageID,
+                }),
           Continue: Effect.fnUntraced(function* (outcome) {
-            yield* retry.wait({
-              decision: outcome.decision,
-              error: outcome.error,
-              assistantMessageID,
-            })
+            if (!outcome.decision.silent)
+              yield* retry.wait({
+                decision: outcome.decision,
+                error: outcome.error,
+                assistantMessageID,
+              })
             yield* bus.publish(SessionEvent.Synthetic, { sessionID, text: CONTINUE_AFTER_INCOMPLETE_STREAM })
             assistantMessageID = SessionMessage.ID.create()
           }),
@@ -423,6 +448,7 @@ export const node = makeLocationNode({
     SessionStore.node,
     SessionCompaction.node,
     Plugin.node,
+    Model.node,
     SessionTitle.node,
     Snapshot.node,
     ToolOutput.node,
