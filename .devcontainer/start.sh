@@ -5,6 +5,10 @@ cd /workspaces/projects 2>/dev/null || cd "$HOME"
 
 if [ -n "${CODESPACE_NAME:-}" ] && [ -n "${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}" ]; then
   url="https://${CODESPACE_NAME}-4096.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+  # A ready session on first start, so the web app has a prompt box one tap away.
+  if ! osta api get /api/session 2>/dev/null | grep -q '"id"'; then
+    osta api post /api/session --data "{\"title\":\"أسطى\",\"location\":{\"directory\":\"$PWD\"}}" >/dev/null 2>&1 || true
+  fi
   link=$(osta pair --url "$url" 2>/dev/null | grep -o "$url/auth/connect/[^[:space:]]*" | head -n 1)
   if [ -n "$link" ]; then
     printf '\n  Osta web app (works well on a phone): %s\n  The link works once and expires soon. Run osta-start again for a new one.\n\n' "$link"
