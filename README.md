@@ -14,7 +14,11 @@
 
 "Osta" is what Egyptians call a master craftsman: someone who does the job right the first time, quickly, and without being watched. Osta is a coding agent for your terminal built on [opencode](https://github.com/anomalyco/opencode). It does everything opencode does, adds its own way of working, and remembers what it learns from every project.
 
-### Try it now, nothing to install
+### Chat with Osta in your browser
+
+**[mh1771045-boop.github.io/osta](https://mh1771045-boop.github.io/osta/)**: open it and start talking, or install it on your phone like an app. It is free and needs no API key: answers come through [Puter](https://puter.com), and you create a free Puter account in one tap the first time. Your chats and what Osta learns about you stay on your device. The web app can't touch your files; for that, use Osta itself below.
+
+### Try the full Osta, nothing to install
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mh1771045-boop/osta?quickstart=1)
 

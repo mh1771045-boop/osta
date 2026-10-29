@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>أسطى</title>
+<meta name="description" content="أسطى: مساعد برمجة بالعربي. مجاني، من غير مفتاح API، وبيتعلّم منك وبيفتكر.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f9f9f9" media="(prefers-color-scheme: light)" id="theme-light">
+<meta name="theme-color" content="#1d1d1f" media="(prefers-color-scheme: dark)" id="theme-dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أسطى">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta property="og:title" content="أسطى">
+<meta property="og:description" content="مساعد برمجة بالعربي. مجاني، من غير مفتاح API، وبيتعلّم منك.">
+<meta property="og:image" content="icons/icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Only a fallback for devices without SF Arabic, so it never blocks the first paint. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<style>
+/* Layout: one-screen chat in the style of Apple Messages. A translucent nav, a scrolling thread, and a composer pinned above the keyboard. */
+:root {
+  --bg: #ffffff;
+  --bg-grouped: #f2f2f7;
+  --bg-cell: #ffffff;
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-strong: rgba(120, 120, 128, 0.2);
+  --label: #000000;
+  --label-2: rgba(60, 60, 67, 0.6);
+  --label-3: rgba(60, 60, 67, 0.3);
+  --separator: rgba(60, 60, 67, 0.29);
+  --accent: #007aff;
+  --on-accent: #ffffff;
+  --danger: #ff3b30;
+  --green: #34c759;
+  --orange: #ff9500;
+  --indigo: #5856d6;
+  --code-bg: #f2f2f7;
+  --nav: rgba(249, 249, 249, 0.94);
+  --sheet: #f2f2f7;
+  --scrim: rgba(0, 0, 0, 0.4);
+  --thumb: #ffffff;
+  --mark-weak: rgba(60, 60, 67, 0.18);
+  --mark-left: #8e8e93;
+  --mark-right: #1c1c1e;
+  --font: -apple-system, BlinkMacSystemFont, "SF Arabic", "SF Pro Text", system-ui, "IBM Plex Sans Arabic", sans-serif;
+  --mono: ui-monospace, "SF Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --bg-grouped: #000000; --bg-cell: #2c2c2e; --fill: rgba(118, 118, 128, 0.24); --fill-strong: rgba(118, 118, 128, 0.32);
+    --label: #ffffff; --label-2: rgba(235, 235, 245, 0.6); --label-3: rgba(235, 235, 245, 0.3);
+    --separator: rgba(84, 84, 88, 0.65); --accent: #0a84ff; --danger: #ff453a; --green: #30d158; --orange: #ff9f0a; --indigo: #5e5ce6;
+    --code-bg: #1c1c1e; --nav: rgba(29, 29, 31, 0.94); --sheet: #1c1c1e; --scrim: rgba(0, 0, 0, 0.55); --thumb: #636366;
+    --mark-weak: rgba(235, 235, 245, 0.16); --mark-left: #8e8e93; --mark-right: #ffffff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #000000; --bg-grouped: #000000; --bg-cell: #2c2c2e; --fill: rgba(118, 118, 128, 0.24); --fill-strong: rgba(118, 118, 128, 0.32);
+  --label: #ffffff; --label-2: rgba(235, 235, 245, 0.6); --label-3: rgba(235, 235, 245, 0.3);
+  --separator: rgba(84, 84, 88, 0.65); --accent: #0a84ff; --danger: #ff453a; --green: #30d158; --orange: #ff9f0a; --indigo: #5e5ce6;
+  --code-bg: #1c1c1e; --nav: rgba(29, 29, 31, 0.94); --sheet: #1c1c1e; --scrim: rgba(0, 0, 0, 0.55); --thumb: #636366;
+  --mark-weak: rgba(235, 235, 245, 0.16); --mark-left: #8e8e93; --mark-right: #ffffff;
+  color-scheme: dark;
+}
+html, body { height: 100%; margin: 0; }
+html { background: var(--bg); }
+body {
+  background: var(--bg); color: var(--label); font-family: var(--font); font-size: 17px; line-height: 1.47;
+  -webkit-font-smoothing: antialiased; overflow: hidden; -webkit-text-size-adjust: 100%;
+}
+body.sheet-open { background: #000; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, textarea:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.app {
+  position: fixed; inset-inline: 0; top: var(--app-top, 0px); height: var(--app-h, 100dvh);
+  display: flex; flex-direction: column; background: var(--bg); overflow: hidden;
+  transition: transform 0.45s var(--spring), border-radius 0.45s var(--spring);
+}
+@media (max-width: 700px) {
+  body.sheet-open .app { transform: scale(0.94) translateY(env(safe-area-inset-top, 0px)); border-radius: 12px; }
+}
+
+/* Nav bar */
+.nav {
+  position: relative; z-index: 5; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  min-height: 52px; padding-top: env(safe-area-inset-top, 0px);
+  padding-inline: max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-left, 0px));
+  background: var(--nav); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid transparent; transition: border-color 0.2s;
+}
+.nav.scrolled { border-bottom-color: var(--separator); }
+.nav .side { display: flex; gap: 0; }
+.nav .side.end { justify-content: flex-end; }
+.brand { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
+.brand svg { height: 17px; width: auto; display: block; }
+.brand .status { font-size: 11px; line-height: 13px; color: var(--label-2); white-space: nowrap; }
+.brand .status.off { color: var(--orange); }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 22px; color: var(--accent); }
+.icon-btn:active { background: var(--fill); }
+.icon-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Thread */
+.thread { flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.thread-inner {
+  max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px;
+  padding-block: 18px 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.welcome { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-block: 5vh 8px; }
+.welcome > svg { width: 150px; height: auto; }
+.welcome h1 { margin: 6px 0 0; font-size: 28px; line-height: 34px; font-weight: 700; text-wrap: balance; }
+.welcome p { margin: 0; color: var(--label-2); font-size: 15px; line-height: 20px; max-width: 34ch; text-wrap: balance; }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; max-width: 560px; }
+.chip { padding: 9px 14px; border-radius: 18px; background: var(--fill); font-size: 15px; line-height: 20px; text-align: start; }
+.chip:active { background: var(--fill-strong); }
+.card {
+  width: 100%; max-width: 420px; margin-top: 18px; display: flex; align-items: center; gap: 12px; text-align: start;
+  padding: 12px 14px; border-radius: 14px; background: var(--fill);
+}
+.card img { width: 44px; height: 44px; border-radius: 10px; flex: none; }
+.card .grow { flex: 1; min-width: 0; }
+.card .t { font-size: 15px; line-height: 20px; font-weight: 600; }
+.card .s { font-size: 13px; line-height: 18px; color: var(--label-2); }
+.card .go { color: var(--on-accent); background: var(--accent); font-size: 15px; font-weight: 600; padding: 6px 14px; border-radius: 16px; flex: none; }
+.card .x { color: var(--label-3); width: 28px; height: 28px; border-radius: 14px; display: grid; place-items: center; flex: none; }
+.card .x svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+
+.msg { display: flex; flex-direction: column; min-width: 0; }
+.msg.enter { animation: rise 0.35s var(--spring) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.msg.user { align-items: flex-end; }
+.bubble {
+  max-width: min(82%, 560px); padding: 9px 14px; border-radius: 18px; background: var(--accent); color: var(--on-accent);
+  white-space: pre-wrap; overflow-wrap: anywhere; font-size: 17px; line-height: 22px;
+}
+.msg.user .bubble { border-end-end-radius: 6px; }
+.msg.assistant { gap: 6px; }
+.who { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--label-2); font-weight: 600; }
+.who svg { width: 34px; height: auto; }
+.md { min-width: 0; overflow-wrap: anywhere; font-size: 17px; line-height: 1.5; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 10px; }
+.md h1, .md h2, .md h3 { margin: 16px 0 6px; line-height: 1.3; }
+.md h1 { font-size: 22px; } .md h2 { font-size: 20px; } .md h3 { font-size: 17px; }
+.md ul, .md ol { margin: 0 0 10px; padding-inline-start: 22px; }
+.md li { margin: 3px 0; }
+.md a { color: var(--accent); }
+.md hr { border: 0; border-top: 0.5px solid var(--separator); margin: 14px 0; }
+.md code { font-family: var(--mono); font-size: 0.86em; background: var(--fill); padding: 1px 5px; border-radius: 6px; }
+.md blockquote { margin: 0 0 10px; padding-inline-start: 12px; border-inline-start: 3px solid var(--separator); color: var(--label-2); }
+.md .table { overflow-x: auto; margin: 0 0 12px; border-radius: 10px; border: 0.5px solid var(--separator); }
+.md table { border-collapse: collapse; font-size: 15px; line-height: 20px; min-width: 100%; }
+.md th, .md td { padding: 7px 10px; text-align: start; border-bottom: 0.5px solid var(--separator); white-space: nowrap; }
+.md th { background: var(--fill); font-weight: 600; }
+.md tr:last-child td { border-bottom: 0; }
+.codeblock { margin: 0 0 12px; border-radius: 12px; background: var(--code-bg); overflow: hidden; border: 0.5px solid var(--separator); }
+.codeblock .bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px 6px 12px; font-size: 12px; color: var(--label-2); font-family: var(--mono); }
+.codeblock .bar button { font-family: var(--font); font-size: 13px; color: var(--accent); padding: 4px 8px; border-radius: 6px; }
+.codeblock pre { margin: 0; padding: 4px 14px 14px; overflow-x: auto; }
+.codeblock pre code { background: none; padding: 0; font-size: 13.5px; line-height: 1.55; white-space: pre; }
+.thinking { display: inline-flex; gap: 5px; padding: 12px 2px; }
+.thinking i { width: 8px; height: 8px; border-radius: 50%; background: var(--label-3); animation: dot 1.2s infinite ease-in-out; }
+.thinking i:nth-child(2) { animation-delay: 0.15s; } .thinking i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dot { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+.note { font-size: 13px; color: var(--label-2); }
+.actions { display: flex; gap: 4px; margin-inline-start: -8px; }
+.actions button { font-size: 13px; color: var(--label-2); padding: 4px 8px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px; }
+.actions button:active { background: var(--fill); }
+.actions svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.learned { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: 13px; color: var(--label-2); background: var(--fill); padding: 4px 10px; border-radius: 12px; animation: rise 0.35s var(--spring) both; }
+.banner { border-radius: 14px; padding: 12px 14px; background: var(--fill); font-size: 15px; line-height: 20px; display: flex; flex-direction: column; gap: 8px; }
+.banner button { align-self: flex-start; color: var(--accent); font-weight: 600; }
+
+/* Composer */
+.composer {
+  padding-top: 8px; padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
+  background: var(--nav); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid var(--separator);
+}
+.composer-inner { max-width: 760px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; }
+.field { flex: 1; min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--separator); border-radius: 20px; background: var(--bg); }
+.field .preview { display: flex; align-items: center; gap: 8px; padding: 8px 10px 0; }
+.field .preview img { height: 54px; max-width: 120px; object-fit: cover; border-radius: 10px; }
+.field .preview button { color: var(--label-2); font-size: 13px; }
+textarea {
+  width: 100%; border: 0; outline: none; resize: none; background: transparent; color: var(--label);
+  font: inherit; font-size: 17px; line-height: 22px; padding: 8px 14px; max-height: 160px; min-height: 38px; display: block;
+}
+textarea::placeholder { color: var(--label-3); }
+.round { width: 34px; height: 34px; flex: none; border-radius: 17px; display: grid; place-items: center; margin-bottom: 2px; }
+.round svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.send { background: var(--accent); color: var(--on-accent); transition: transform 0.15s, background-color 0.2s; }
+.send:disabled { background: var(--fill-strong); color: var(--label-3); cursor: default; }
+.send:not(:disabled):active { transform: scale(0.9); }
+.stop { background: var(--label); color: var(--bg); }
+.stop svg { fill: currentColor; stroke: none; }
+.attach { color: var(--label-2); }
+.attach svg { stroke-width: 1.9; width: 24px; height: 24px; }
+.attach:active { background: var(--fill); }
+.hint { max-width: 760px; margin: 6px auto 0; font-size: 11px; line-height: 13px; color: var(--label-3); text-align: center; }
+
+/* Toast */
+.toast {
+  position: fixed; z-index: 40; inset-inline: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); margin: 0 auto; width: max-content; max-width: calc(100% - 32px);
+  display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; padding-inline-start: 16px;
+  background: var(--bg-cell); color: var(--label); border-radius: 22px; font-size: 15px; line-height: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16), 0 0 0 0.5px var(--separator);
+  transform: translateY(40px) scale(0.96); opacity: 0; transition: transform 0.45s var(--spring), opacity 0.3s;
+}
+.toast.show { transform: none; opacity: 1; }
+.toast button { color: var(--on-accent); background: var(--accent); font-weight: 600; padding: 5px 14px; border-radius: 15px; flex: none; }
+
+/* Sheets */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 20; opacity: 0; transition: opacity 0.3s; }
+.scrim.open { opacity: 1; }
+.sheet {
+  position: fixed; inset-inline: 0; bottom: 0; z-index: 21; max-height: calc(100% - env(safe-area-inset-top, 0px) - 24px); display: flex; flex-direction: column;
+  background: var(--sheet); border-radius: 13px 13px 0 0; transform: translateY(100%);
+  transition: transform 0.45s var(--spring);
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet.open { transform: translateY(0); }
+@media (min-width: 701px) {
+  .sheet { inset-inline: 0; margin: 0 auto; max-width: 560px; bottom: auto; top: 50%; border-radius: 14px; transform: translateY(-50%) scale(1.04); opacity: 0; transition: transform 0.3s var(--spring), opacity 0.2s; max-height: min(760px, calc(100% - 48px)); }
+  .sheet.open { transform: translateY(-50%); opacity: 1; }
+  .sheet .grabber { visibility: hidden; height: 2px; }
+}
+.grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--label-3); margin: 6px auto 2px; flex: none; }
+.sheet header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding-block: 6px 10px; max-width: 760px; width: 100%; margin: 0 auto; flex: none; }
+.sheet h2 { margin: 0; font-size: 17px; line-height: 22px; font-weight: 600; grid-column: 2; }
+.sheet header button { color: var(--accent); font-size: 17px; font-weight: 600; justify-self: end; grid-column: 3; padding: 4px 0; }
+.sheet .body { overflow-y: auto; max-width: 760px; width: 100%; margin: 0 auto; padding-bottom: 8px; overscroll-behavior: contain; }
+.section { margin-bottom: 22px; }
+.section-h { font-size: 13px; line-height: 18px; color: var(--label-2); margin: 0 16px 6px; }
+.group { background: var(--bg-cell); border-radius: 12px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding-inline: 16px; position: relative; width: 100%; text-align: start; }
+.row + .row::before { content: ""; position: absolute; top: 0; inset-inline: 16px 0; border-top: 0.5px solid var(--separator); }
+.row.has-tile + .row::before, .row + .row.has-tile::before { inset-inline-start: 57px; }
+.row .grow { flex: 1; min-width: 0; padding-block: 11px; }
+.row .t { font-size: 17px; line-height: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .s { font-size: 13px; line-height: 18px; color: var(--label-2); overflow: hidden; text-overflow: ellipsis; }
+.row .v { color: var(--label-2); font-size: 17px; flex: none; }
+.row .chev { width: 8px; height: 13px; flex: none; color: var(--label-3); stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transform: scaleX(-1); }
+.row .lesson { white-space: normal; font-size: 15px; line-height: 20px; }
+.row.current .t { color: var(--accent); font-weight: 600; }
+.row .del { color: var(--danger); font-size: 15px; padding: 6px; flex: none; }
+.row button.grow, a.row { color: inherit; text-decoration: none; }
+button.row:active, a.row:active, .row button.grow:active { background: var(--fill); }
+.row.action .t { color: var(--accent); }
+.row.danger .t { color: var(--danger); }
+.tile { width: 29px; height: 29px; border-radius: 7px; display: grid; place-items: center; flex: none; color: #fff; }
+.tile svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tile.blue { background: var(--accent); } .tile.green { background: var(--green); } .tile.orange { background: var(--orange); }
+.tile.indigo { background: var(--indigo); } .tile.gray { background: #8e8e93; } .tile.red { background: var(--danger); }
+.avatar { width: 46px; height: 46px; border-radius: 23px; flex: none; display: grid; place-items: center; font-size: 20px; font-weight: 600; color: #fff; background: linear-gradient(#a2a2a8, #7c7c82); }
+.meter { height: 6px; border-radius: 3px; background: var(--fill-strong); overflow: hidden; margin-top: 6px; }
+.meter i { display: block; height: 100%; background: var(--green); border-radius: 3px; transition: width 0.6s var(--spring); }
+.meter.low i { background: var(--orange); }
+.foot { font-size: 13px; color: var(--label-2); line-height: 18px; margin: 7px 16px 0; }
+.foot a { color: var(--accent); text-decoration: none; }
+.empty { color: var(--label-2); font-size: 15px; text-align: center; padding: 24px 8px; }
+.segmented { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: 9px; background: var(--fill); position: relative; margin: 8px 16px 10px; }
+.segmented button { position: relative; z-index: 1; font-size: 13px; line-height: 18px; font-weight: 500; padding: 6px 4px; border-radius: 7px; transition: background-color 0.2s; }
+.segmented button[aria-checked="true"] { background: var(--thumb); font-weight: 600; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04); }
+.add { display: flex; gap: 8px; margin-top: 12px; }
+.add input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 0; background: var(--bg-cell); color: var(--label); }
+.add button { color: var(--accent); font-weight: 600; padding-inline: 8px; }
+
+/* Onboarding sheet */
+.intro { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 8px 8px 0; }
+.intro img { width: 72px; height: 72px; border-radius: 16px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); }
+.intro h3 { margin: 16px 0 4px; font-size: 28px; line-height: 34px; font-weight: 700; }
+.intro > p { margin: 0; color: var(--label-2); font-size: 15px; line-height: 20px; }
+.features { display: flex; flex-direction: column; gap: 18px; margin: 24px 4px 10px; text-align: start; width: 100%; max-width: 420px; }
+.feature { display: flex; gap: 14px; align-items: flex-start; }
+.feature .tile { width: 38px; height: 38px; border-radius: 10px; }
+.feature .tile svg { width: 22px; height: 22px; }
+.feature div > b { display: block; font-size: 15px; line-height: 20px; font-weight: 600; }
+.feature div > span { display: block; font-size: 15px; line-height: 20px; color: var(--label-2); }
+.primary { width: 100%; max-width: 420px; min-height: 50px; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-size: 17px; font-weight: 600; margin-top: 12px; }
+.primary:active { opacity: 0.85; }
+.primary:disabled { opacity: 0.6; }
+.form-error { color: var(--danger); font-size: 15px; line-height: 20px; margin: 10px 0 0; min-height: 20px; }
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 18px 0 6px; display: flex; flex-direction: column; gap: 14px; text-align: start; width: 100%; max-width: 420px; }
+.steps li { counter-increment: step; display: flex; gap: 12px; align-items: center; font-size: 17px; line-height: 22px; }
+.steps li::before { content: counter(step, arabic-indic); width: 28px; height: 28px; border-radius: 14px; background: var(--fill); display: grid; place-items: center; font-size: 15px; font-weight: 600; flex: none; }
+.steps svg { width: 20px; height: 20px; vertical-align: -4px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .scrim, .app, .toast { transition: none; }
+  .msg.enter, .learned { animation: none; }
+  .thinking i { animation: none; opacity: 0.8; }
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <nav class="nav" id="nav">
+    <div class="side">
+      <button class="icon-btn" id="btn-chats" aria-label="المحادثات">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-settings" aria-label="الإعدادات">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+    <div class="brand">
+      <svg viewBox="0 0 114 42" aria-hidden="true" id="nav-mark"></svg>
+      <span class="status" id="status" aria-live="polite">مساعد البرمجة</span>
+    </div>
+    <div class="side end">
+      <button class="icon-btn" id="btn-memory" aria-label="ذاكرة أسطى">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5a5.5 5.5 0 0 0-3.2 10c.6.5 1 1.1 1 1.9v.6h4.4v-.6c0-.8.4-1.4 1-1.9a5.5 5.5 0 0 0-3.2-10z"/><path d="M10 19h4M10.8 21.5h2.4"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-new" aria-label="محادثة جديدة">
+        <svg viewBox="0 0 24 24"><path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <main class="thread" id="thread">
+    <div class="thread-inner" id="messages"></div>
+  </main>
+
+  <footer class="composer">
+    <div class="composer-inner">
+      <button class="round attach" id="btn-attach" aria-label="ضيف صورة">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10.5" r="1.6"/><path d="M21 15.5l-5-5-9 8.5"/></svg>
+      </button>
+      <input type="file" id="file" accept="image/*" hidden>
+      <div class="field">
+        <div class="preview" id="preview" hidden>
+          <img id="preview-img" alt="الصورة المرفقة">
+          <button id="preview-remove">شيل الصورة</button>
+        </div>
+        <textarea id="input" rows="1" dir="auto" placeholder="اكتب لأسطى…" aria-label="رسالتك" enterkeyhint="send"></textarea>
+      </div>
+      <button class="round send" id="btn-send" aria-label="ابعت" disabled>
+        <svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+      </button>
+      <button class="round stop" id="btn-stop" aria-label="وقّف" hidden>
+        <svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+      </button>
+    </div>
+    <p class="hint">مجاني ومن غير مفتاح API، عن طريق Puter. أسطى ممكن يغلط، فراجع الكود قبل ما تستخدمه.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" hidden><span id="toast-text"></span><button id="toast-btn" hidden></button></div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<section class="sheet" id="sheet-chats" role="dialog" aria-modal="true" aria-labelledby="chats-title" hidden>
+  <div class="grabber"></div>
+  <header><h2 id="chats-title">المحادثات</h2><button data-close>تم</button></header>
+  <div class="body"><div class="group" id="chat-list"></div></div>
+</section>
+
+<section class="sheet" id="sheet-memory" role="dialog" aria-modal="true" aria-labelledby="memory-title" hidden>
+  <div class="grabber"></div>
+  <header><h2 id="memory-title">ذاكرة أسطى</h2><button data-close>تم</button></header>
+  <div class="body">
+    <div class="group" id="lesson-list"></div>
+    <form class="add" id="lesson-form">
+      <input id="lesson-input" dir="auto" placeholder="علّم أسطى حاجة… مثلاً: بحب الردود القصيرة" aria-label="درس جديد" maxlength="300" enterkeyhint="done">
+      <button type="submit">ضيف</button>
+    </form>
+    <p class="foot">أسطى بيكتب هنا اللي بيتعلّمه عنك وعن مشاريعك، وبيقراه في كل محادثة. الذاكرة محفوظة على جهازك بس.</p>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+  <div class="grabber"></div>
+  <header><h2 id="settings-title">الإعدادات</h2><button data-close>تم</button></header>
+  <div class="body">
+    <div class="section">
+      <div class="group">
+        <div class="row">
+          <div class="avatar" id="acct-avatar" aria-hidden="true">؟</div>
+          <div class="grow"><div class="t" id="acct-name">مش مسجّل</div><div class="s" id="acct-sub">حساب Puter المجاني</div></div>
+          <button class="del" id="acct-btn" style="color: var(--accent)">دخول</button>
+        </div>
+        <div class="row" id="credit-row" hidden>
+          <div class="grow">
+            <div class="t" style="display:flex;justify-content:space-between;gap:8px"><span>الرصيد المجاني</span><span class="v" id="credit-value"></span></div>
+            <div class="meter" id="credit-meter"><i style="width:0"></i></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">أسطى بيكلّم نماذج ذكاء اصطناعي قوية عن طريق Puter. كل حساب عليه رصيد مجاني بيتجدد كل شهر، من غير فلوس ومن غير مفتاح API.</p>
+    </div>
+
+    <div class="section">
+      <p class="section-h">النموذج</p>
+      <div class="group">
+        <div class="segmented" role="radiogroup" aria-label="النموذج" id="tier">
+          <button role="radio" data-tier="best">الأقوى</button>
+          <button role="radio" data-tier="balanced">متوازن</button>
+          <button role="radio" data-tier="light">الأوفر</button>
+        </div>
+        <div class="row"><div class="grow"><div class="t" id="model-name">…</div></div></div>
+      </div>
+      <p class="foot">«الأقوى» أذكى بس بيصرف الرصيد أسرع. لو الرصيد خلص، «الأوفر» غالباً هيفضل شغال.</p>
+    </div>
+
+    <div class="section">
+      <p class="section-h">المظهر</p>
+      <div class="group">
+        <div class="segmented" role="radiogroup" aria-label="المظهر" id="theme">
+          <button role="radio" data-theme-choice="auto">تلقائي</button>
+          <button role="radio" data-theme-choice="light">فاتح</button>
+          <button role="radio" data-theme-choice="dark">داكن</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-h">البيانات</p>
+      <div class="group">
+        <button class="row has-tile" id="btn-backup"><span class="tile blue"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/></svg></span><span class="grow"><span class="t" style="display:block">خد نسخة احتياطية</span></span></button>
+        <button class="row has-tile" id="btn-restore"><span class="tile green"><svg viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5"/><path d="M5 5h14"/></svg></span><span class="grow"><span class="t" style="display:block">استرجع نسخة</span></span></button>
+        <button class="row has-tile danger" id="btn-wipe"><span class="tile red"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span><span class="grow"><span class="t" style="display:block" id="wipe-label">امسح المحادثات والذاكرة</span></span></button>
+      </div>
+      <input type="file" id="restore-file" accept="application/json,.json" hidden>
+      <p class="foot">محادثاتك وذاكرة أسطى محفوظة على جهازك بس. خد نسخة احتياطية قبل ما تمسح المتصفح أو تغيّر الموبايل.</p>
+    </div>
+
+    <div class="section">
+      <p class="section-h">التطبيق</p>
+      <div class="group">
+        <button class="row has-tile" id="btn-install" hidden><span class="tile indigo"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span><span class="grow"><span class="t" style="display:block">ثبّت أسطى على جهازك</span></span><svg class="chev" viewBox="0 0 8 13"><path d="M1.5 1.5l5 5-5 5"/></svg></button>
+        <a class="row has-tile" href="https://github.com/mh1771045-boop/osta" target="_blank" rel="noopener"><span class="tile gray"><svg viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></span><span class="grow"><span class="t" style="display:block">أسطى الكامل للكمبيوتر</span><span class="s" style="display:block">بيعدّل ملفاتك وبيشغّل الأوامر بنفسه</span></span><svg class="chev" viewBox="0 0 8 13"><path d="M1.5 1.5l5 5-5 5"/></svg></a>
+        <div class="row has-tile"><span class="tile gray"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></span><span class="grow"><span class="t" style="display:block">الإصدار</span></span><span class="v" id="version" dir="ltr"></span></div>
+      </div>
+      <p class="foot">تصميم وتطوير: <a href="https://wa.me/201206580045" target="_blank" rel="noopener">محمد الشيخ</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-signin" role="dialog" aria-modal="true" aria-labelledby="signin-title" hidden>
+  <div class="grabber"></div>
+  <header><span></span><span></span><button data-close>لاحقاً</button></header>
+  <div class="body">
+    <div class="intro">
+      <img src="icons/icon-192.png" alt="">
+      <h3 id="signin-title">ابدأ مع أسطى</h3>
+      <p>خطوة واحدة بس، ومرة واحدة.</p>
+      <div class="features">
+        <div class="feature"><span class="tile green"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S9.5 8 12 8c2.5 0 6 0 6-1.5S14 4 12 8z"/></svg></span><div><b>مجاني بالكامل</b><span>من غير فلوس ومن غير مفتاح API.</span></div></div>
+        <div class="feature"><span class="tile blue"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><b>حساب Puter في ثانية</b><span>هتفتح نافذة صغيرة من Puter، الخدمة اللي بيرد أسطى عن طريقها. وافق وارجع هنا.</span></div></div>
+        <div class="feature"><span class="tile orange"><svg viewBox="0 0 24 24"><path d="M12 3.5a5.5 5.5 0 0 0-3.2 10c.6.5 1 1.1 1 1.9v.6h4.4v-.6c0-.8.4-1.4 1-1.9a5.5 5.5 0 0 0-3.2-10z"/><path d="M10 19h4M10.8 21.5h2.4"/></svg></span><div><b>بيتعلّم منك</b><span>بيفتكر اللي يعرفه عنك، ومحادثاتك محفوظة على جهازك.</span></div></div>
+      </div>
+      <p class="form-error" id="signin-error" role="alert"></p>
+      <button class="primary" id="btn-signin">كمّل</button>
+    </div>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-install" role="dialog" aria-modal="true" aria-labelledby="install-title" hidden>
+  <div class="grabber"></div>
+  <header><span></span><span></span><button data-close>تم</button></header>
+  <div class="body">
+    <div class="intro">
+      <img src="icons/icon-192.png" alt="">
+      <h3 id="install-title">ثبّت أسطى</h3>
+      <p>هيبقى أيقونة على شاشتك ويفتح زي أي تطبيق.</p>
+      <ol class="steps" id="install-steps"></ol>
+    </div>
+  </div>
+</section>
+
+<script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+name: web app
+
+# Tests the web app in web/ and publishes it to GitHub Pages
+# (https://mh1771045-boop.github.io/osta/) through the gh-pages branch.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "script/osta/web-test.mjs"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "script/osta/web-test.mjs"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --global playwright@1.56.1
+          npx --yes playwright@1.56.1 install --with-deps chromium
+      - name: Run the web app tests
+        run: NODE_PATH="$(npm root --global)" node script/osta/web-test.mjs "$RUNNER_TEMP/web-test"
+
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - name: Publish web/ to the gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp -r web "$RUNNER_TEMP/site"
+          touch "$RUNNER_TEMP/site/.nojekyll"
+          cd "$RUNNER_TEMP/site"
+          git init --quiet --initial-branch gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit --quiet --message "Publish the web app from ${GITHUB_SHA::7}"
+          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
