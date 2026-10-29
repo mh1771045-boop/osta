@@ -95,7 +95,12 @@ const FAKE_PUTER = `(() => {
   };
 })();`
 
-const browser = await chromium.launch()
+// Keep the run offline from the real CDNs: page requests are answered by the routes
+// below, and the service worker's own refreshes fail instead of fetching the real
+// Puter over the fake one in its cache (CI machines can reach the internet).
+const browser = await chromium.launch({
+  args: ["--host-resolver-rules=" + ["js.puter.com", "cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"].map((h) => `MAP ${h} 127.0.0.1:9`).join(", ")],
+})
 const results = []
 async function test(name, fn) {
   try {
