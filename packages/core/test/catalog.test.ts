@@ -594,6 +594,48 @@ describe("Provider and Model", () => {
     }),
   )
 
+  it.effect("defaults to Kilo's Nemotron Ultra, then Lightning, ahead of Osta's free models", () =>
+    Effect.gen(function* () {
+      const providers = yield* Provider.Service
+      const models = yield* Model.Service
+      const kilo = Provider.ID.make("kilo")
+      const copilot = Provider.ID.make("github-copilot")
+      yield* providers.transform((editor) => {
+        editor.update(Provider.ID.opencode, () => {})
+        editor.update(kilo, () => {})
+        editor.update(copilot, () => {})
+        editor.models.update(Provider.ID.opencode, Model.ID.make("big-pickle"), (model) => {
+          model.time.released = 3000
+        })
+        editor.models.update(kilo, Model.KILO_LIGHTNING, (model) => {
+          model.time.released = 2000
+        })
+        editor.models.update(kilo, Model.KILO_ULTRA, (model) => {
+          model.time.released = 1000
+        })
+        // Copilot's catalog lists prices, yet a subscription keeps Osta on its free default.
+        editor.models.update(copilot, Model.ID.make("gpt-5.5"), (model) => {
+          model.time.released = 4000
+          model.cost = [
+            {
+              input: Money.USDPerMillionTokens.make(5),
+              output: Money.USDPerMillionTokens.make(30),
+              cache: { read: Money.USDPerMillionTokens.zero, write: Money.USDPerMillionTokens.zero },
+            },
+          ]
+        })
+      })
+
+      expect((yield* models.available()).map((model) => `${model.providerID}/${model.id}`)).toEqual([
+        `kilo/${Model.KILO_ULTRA}`,
+        `kilo/${Model.KILO_LIGHTNING}`,
+        "opencode/big-pickle",
+        "github-copilot/gpt-5.5",
+      ])
+      expect((yield* models.default())?.id).toBe(Model.KILO_ULTRA)
+    }),
+  )
+
   it.effect("keeps the newest default when a paid model is available", () =>
     Effect.gen(function* () {
       const providers = yield* Provider.Service

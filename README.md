@@ -46,8 +46,11 @@ Prebuilt downloads for every platform are on the [Releases page](https://github.
 
 Osta starts with free models and never asks for a key on first run.
 
-- **Built-in free models.** They come from the free tier of OpenCode Zen, the model service run by the opencode team. The models on offer, their limits and their data policy are set by that service and can change.
-- **GitHub Copilot Free.** Run `osta auth login`, pick GitHub Copilot, and sign in with your GitHub account in the browser.
+- **Kilo's free Nemotron models (the default).** Osta starts on NVIDIA Nemotron 3 Ultra through the [Kilo gateway](https://kilo.ai), with Nemotron 3.5 Lightning as its fast second. Kilo serves its `:free` models without an account, limited per IP address (about 200 requests an hour today).
+- **OpenCode Zen's free models.** They come from the free tier of OpenCode Zen, the model service run by the opencode team.
+- **GitHub Copilot Free.** Osta offers the sign-in on first launch. Later, run `/connect` (or `osta auth login`), pick GitHub Copilot, and sign in with your GitHub account in the browser.
+
+When one source runs out (a 429 or a used-up free limit), Osta quietly moves the same task to the next one and keeps going: Kilo Ultra, then Kilo Lightning, then Zen, then Copilot, then a local Ollama if you run one. Osta's personality and way of working come from its own prompt, so they stay the same on every model. The models on offer, their limits and their data policies are set by each service and can change.
 - **Local models.** Run models on your own machine with [Ollama](https://ollama.com) or LM Studio and add them as a provider (example below).
 
 Paid providers such as Anthropic, OpenAI and Google work too, but you never need them.
@@ -70,6 +73,20 @@ Install Ollama, pull a coding model (`ollama pull qwen2.5-coder:7b`), then add t
 ```
 
 Pick it with `/models` in Osta, or run `osta run -m ollama/qwen2.5-coder:7b "..."`. Osta uses opencode's provider format, so the [OpenCode V2 provider docs](https://opencode.ai/v2/docs/providers) apply.
+
+### The team: five minds
+
+Osta works as a small team. Each mind has its own personality, way of working and free model, and lives in its own file under `packages/core/src/plugin/agents/`.
+
+| Mind | ID | Does | Can change files |
+|---|---|---|---|
+| الأسطى (Osta) | `osta` | The lead: understands, decides, builds, verifies, reports, learns, and hands work to the others | Yes; asks only before dangerous commands |
+| الباشمهندس | `bashmohandes` | Plans: files, numbered steps, risks, and how to verify | No |
+| المفتّش | `mofattesh` | Reviews: real problems only, most severe first, with file and line | No |
+| الحكيم | `hakim` | Debugs: reproduces, finds the cause, compares fixes, fixes, verifies | Yes; asks only before dangerous commands |
+| الأستاذ | `ostaz` | Teaches: explains with the real code and line numbers, draws diagrams, ends with a quiz | No |
+
+Osta hands out the work on his own: for a feature, الباشمهندس plans, Osta builds and المفتّش reviews. You can also call any mind yourself with `@`, for example `@ostaz explain this file`, or switch to one with Tab. Lessons in `.osta/learnings.md` are shared by all; each mind also keeps the lessons of its own craft in `.osta/learnings/<id>.md`.
 
 ### What Osta adds to opencode
 

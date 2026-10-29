@@ -27,6 +27,8 @@ export interface Decision {
   readonly retry: true
   readonly attempt: number
   readonly delay: number
+  /** A switch to the next free source, which retries at once without announcing a retry. */
+  readonly silent?: boolean
 }
 
 export const policy = (sessionID: SessionSchema.ID) =>
