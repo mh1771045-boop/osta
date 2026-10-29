@@ -74,6 +74,20 @@ Install Ollama, pull a coding model (`ollama pull qwen2.5-coder:7b`), then add t
 
 Pick it with `/models` in Osta, or run `osta run -m ollama/qwen2.5-coder:7b "..."`. Osta uses opencode's provider format, so the [OpenCode V2 provider docs](https://opencode.ai/v2/docs/providers) apply.
 
+### The team: five minds
+
+Osta works as a small team. Each mind has its own personality, way of working and free model, and lives in its own file under `packages/core/src/plugin/agents/`.
+
+| Mind | ID | Does | Can change files |
+|---|---|---|---|
+| الأسطى (Osta) | `osta` | The lead: understands, decides, builds, verifies, reports, learns, and hands work to the others | Yes; asks only before dangerous commands |
+| الباشمهندس | `bashmohandes` | Plans: files, numbered steps, risks, and how to verify | No |
+| المفتّش | `mofattesh` | Reviews: real problems only, most severe first, with file and line | No |
+| الحكيم | `hakim` | Debugs: reproduces, finds the cause, compares fixes, fixes, verifies | Yes; asks only before dangerous commands |
+| الأستاذ | `ostaz` | Teaches: explains with the real code and line numbers, draws diagrams, ends with a quiz | No |
+
+Osta hands out the work on his own: for a feature, الباشمهندس plans, Osta builds and المفتّش reviews. You can also call any mind yourself with `@`, for example `@ostaz explain this file`, or switch to one with Tab. Lessons in `.osta/learnings.md` are shared by all; each mind also keeps the lessons of its own craft in `.osta/learnings/<id>.md`.
+
 ### What Osta adds to opencode
 
 | | |

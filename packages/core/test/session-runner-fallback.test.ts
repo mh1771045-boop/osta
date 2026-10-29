@@ -37,6 +37,11 @@ describe("SessionRunnerFallback.next", () => {
     expect(SessionRunnerFallback.next(ref(ollama), all)).toBeUndefined()
   })
 
+  test("moves any other Kilo free model to Lightning first", () => {
+    const superModel = info("kilo", "nvidia/nemotron-3-super-120b-a12b:free")
+    expect(name(SessionRunnerFallback.next(ref(superModel), all))).toBe(`kilo/${Model.KILO_LIGHTNING}`)
+  })
+
   test("skips sources that are not available", () => {
     expect(name(SessionRunnerFallback.next(ref(ultra), [ultra, ollama]))).toBe("ollama/qwen3:8b")
   })

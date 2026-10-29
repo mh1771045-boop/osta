@@ -3,8 +3,15 @@ export * as SessionSystemPrompt from "./system-prompt.js"
 import PROMPT from "./runner/prompt/system.txt"
 import METHOD from "./runner/prompt/osta-method.txt"
 
+export { PROMPT }
+
 export function make(tools: string[]) {
   return render(PROMPT, tools)
+}
+
+/** Osta's prompt followed by a team member's role, unrendered, so the session fills in tools and method. */
+export function withRole(role: string) {
+  return `${PROMPT.trimEnd()}\n\n${role.trim()}`
 }
 
 export function render(prompt: string, tools: string[]) {

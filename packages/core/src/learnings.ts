@@ -6,6 +6,8 @@ export * as Learnings from "./learnings.js"
 
 export const filename = "learnings.md"
 export const projectDirectory = ".osta"
+/** Each team member's own lessons, `learnings/<agent>.md` beside the shared file. */
+export const agentDirectory = "learnings"
 export const limit = 16_000
 
 const header =
